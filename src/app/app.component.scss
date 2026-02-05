@@ -44,6 +44,7 @@
      display: flex;
      flex-direction: column;
      align-items: center;
+     flex: 0 0 auto;
      position: relative;
      background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
    }
@@ -134,7 +135,8 @@
   /* Garante que a área do jogador ocupe a largura total, mas respeite as bordas */
   width: 100%;
   box-sizing: border-box; 
-  overflow: hidden; /* Mantém o resto travado */
+  overflow: visible; /* Evita cortar carta/hover na base da tela */
+  padding-bottom: 18px;
 }
 
 .player-hand {
@@ -153,7 +155,8 @@
   justify-content: flex-start; 
   
   /* Altura mínima para o efeito de hover não ser cortado */
-  min-height: 180px; 
+  min-height: 260px;
+  overflow-y: visible;
   
   /* ESCONDER A BARRA DE ROLAGEM (Estética) */
   /* Funciona no Chrome/Safari/Edge */
@@ -188,6 +191,7 @@
       ========================================= */
    .battle-area {
      flex: 1;
+     min-height: 0;
      display: flex;
      flex-direction: column;
      justify-content: center;

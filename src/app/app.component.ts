@@ -257,7 +257,7 @@ iniciarPartida() {
     }
 
     if (!empate) {
-      jogadorVenceu ? this.vidaInimigo -= 20 : this.vidaJogador -= 20;
+      jogadorVenceu ? this.vidaInimigo -= 30 : this.vidaJogador -= 30;
     }
   }
 
