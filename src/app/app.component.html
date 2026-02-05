@@ -1,0 +1,110 @@
+<div class="game-container" *ngIf="jogoIniciado; else telaLogin">
+  
+  <button class="btn-exit" (click)="voltarParaLogin()">❌ SAIR</button>
+  
+  <div class="enemy-area">
+    <h2>INIMIGO</h2>
+    
+    <div class="health-bar-container">
+      <div class="health-bar enemy-hp" [style.width.%]="(vidaInimigo > 100 ? 100 : vidaInimigo)"></div>
+    </div>
+    <p class="hp-text">{{ vidaInimigo }} / 100</p>
+
+    <div class="hand enemy-hand">
+      <div class="card-back" *ngFor="let c of maoDoOponente">
+        <div class="inner-design"></div>
+      </div>
+    </div>
+
+    <div class="deck enemy-deck">
+      <span>DECK</span>
+      <strong>{{ deckOponente.length }}</strong>
+    </div>
+  </div>
+
+  <div class="battle-area">
+    
+    <div class="message-box" [ngClass]="{'animate': mensagemBatalha}">
+      {{ mensagemBatalha }}
+    </div>
+
+    <div class="battle-slot enemy-slot">
+        <app-card *ngIf="cartaInimigoSelecionada" 
+                 [cardData]="cartaInimigoSelecionada" 
+                 [isEnemy]="true">
+        </app-card>
+    </div>
+
+  </div>
+
+  <div class="player-area">
+    
+    <div class="deck player-deck">
+      <span>DECK</span>
+      <strong>{{ deckJogador.length }}</strong>
+    </div>
+
+    <div class="hand player-hand">
+      <app-card 
+        *ngFor="let card of maoDoJogador" 
+        [cardData]="card"
+        class="player-card-wrapper"
+        (click)="atacar(card)">
+      </app-card>
+    </div>
+
+    <div class="health-bar-container">
+      <div class="health-bar player-hp" [style.width.%]="(vidaJogador > 120 ? 100 : (vidaJogador / 1.2))"></div>
+    </div>
+    <p class="hp-text">{{ vidaJogador }} HP</p>
+    
+    <h2>{{ nomeJogador }}</h2>
+  </div>
+
+  <div class="modal-overlay" *ngIf="jogoTerminou">
+    <div class="modal-content">
+      <h1>FIM DE JOGO</h1>
+      <p class="result-msg">{{ mensagemBatalha }}</p>
+      <div class="modal-buttons">
+          <button class="btn-action" (click)="reiniciar()">JOGAR NOVAMENTE</button>
+          <button class="btn-action secondary" (click)="voltarParaLogin()">MENU PRINCIPAL</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<ng-template #telaLogin>
+  <div class="login-screen">
+    <div class="login-box">
+      <h1 class="game-title">JIKSTRA TCG</h1>
+      <p class="subtitle">ESCOLHA SEU DESTINO</p>
+      
+      <div class="input-group">
+        <input #nomeInput type="text" (input)="0" placeholder="DIGITE SEU NOME" maxlength="12">
+      </div>
+
+      <div class="class-selection">
+        <div 
+          class="class-card" 
+          *ngFor="let c of classesDisponiveis"
+          [class.selected]="classeSelecionada === c"
+          (click)="selecionarClasse(c)">
+          
+          <div class="icon">{{ c.icone }}</div>
+          <div class="name">{{ c.nome }}</div>
+          <div class="desc">{{ c.desc }}</div>
+          <div class="stat">HP INICIAL: {{ c.vida }}</div>
+        </div>
+      </div>
+
+      <button 
+        class="btn-start"
+        [disabled]="!nomeInput.value || !classeSelecionada"
+        (click)="entrarNoJogo(nomeInput.value)">
+        INICIAR DUELO
+      </button>
+      
+    </div>
+  </div>
+</ng-template>

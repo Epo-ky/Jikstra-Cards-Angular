@@ -1,0 +1,349 @@
+/* =========================================
+   VARIÁVEIS GERAIS
+   ========================================= */
+   $bg-dark: #121212;
+   $bg-panel: #1e1e1e;
+   $gold: #ffd700;
+   $red: #ff4444;
+   $green: #44ff44;
+   $text-color: #e0e0e0;
+   
+   /* =========================================
+      CONTAINER PRINCIPAL DO JOGO
+      ========================================= */
+   .game-container {
+     display: flex;
+     flex-direction: column;
+     height: 100vh;
+     background-color: $bg-dark;
+     color: $text-color;
+     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+     overflow: hidden;
+     position: relative;
+   }
+   
+   .btn-exit {
+     position: absolute;
+     top: 10px;
+     left: 10px;
+     background: transparent;
+     border: 1px solid #444;
+     color: #777;
+     padding: 5px 10px;
+     cursor: pointer;
+     z-index: 100;
+     font-weight: bold;
+     &:hover { color: $red; border-color: $red; }
+   }
+   
+   /* =========================================
+      ÁREAS (INIMIGO / JOGADOR)
+      ========================================= */
+   .enemy-area, .player-area {
+     padding: 10px;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     position: relative;
+     background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+   }
+   
+   .player-area {
+     background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+     margin-top: auto; /* Empurra para baixo */
+   }
+   
+   h2 { margin: 5px 0; font-size: 1.2rem; color: $gold; text-transform: uppercase; letter-spacing: 2px; }
+   
+   /* =========================================
+      BARRAS DE VIDA
+      ========================================= */
+   .health-bar-container {
+     width: 300px;
+     height: 20px;
+     background: #333;
+     border: 2px solid #555;
+     border-radius: 10px;
+     overflow: hidden;
+     margin-bottom: 5px;
+     box-shadow: 0 0 10px rgba(0,0,0,0.5);
+   }
+   
+   .health-bar {
+     height: 100%;
+     transition: width 0.5s ease-out;
+   }
+   
+   .enemy-hp { background: linear-gradient(90deg, #800, $red); }
+   .player-hp { background: linear-gradient(90deg, #060, $green); }
+   
+   .hp-text { font-size: 0.9rem; font-weight: bold; margin: 0; }
+   
+   /* =========================================
+      MÃOS E DECKS
+      ========================================= */
+   .hand {
+     display: flex;
+     gap: 10px;
+     justify-content: center;
+     min-height: 160px;
+     padding: 10px;
+     perspective: 1000px;
+   }
+   
+   .card-back {
+     width: 100px;
+     height: 140px;
+     background: #442200;
+     border: 2px solid #884400;
+     border-radius: 8px;
+     margin-left: -40px; /* Efeito leque */
+     box-shadow: -2px 2px 5px rgba(0,0,0,0.5);
+     
+     .inner-design {
+       width: 100%; height: 100%;
+       background: radial-gradient(circle, #653 10%, transparent 10%), #420;
+       background-size: 10px 10px;
+       opacity: 0.5;
+     }
+     &:first-child { margin-left: 0; }
+   }
+   
+   .deck {
+     position: absolute;
+     right: 20px;
+     top: 50%;
+     transform: translateY(-50%);
+     width: 80px;
+     height: 110px;
+     background: #222;
+     border: 2px dashed #555;
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+     border-radius: 8px;
+     
+     span { font-size: 0.7rem; color: #777; }
+     strong { font-size: 1.5rem; color: $gold; }
+   }
+   
+   /* Procure onde está .player-hand e substitua por isso: */
+
+.player-area {
+  /* Garante que a área do jogador ocupe a largura total, mas respeite as bordas */
+  width: 100%;
+  box-sizing: border-box; 
+  overflow: hidden; /* Mantém o resto travado */
+}
+
+.player-hand {
+  display: flex;
+  align-items: center;
+  
+  /* MUDANÇA 1: Permite rolagem se tiver muitas cartas */
+  overflow-x: auto; 
+  
+  /* MUDANÇA 2: Garante que use o espaço todo */
+  width: 100%;
+  max-width: 100vw;
+  padding: 20px 40px; /* Espaço nas laterais para a 1ª e última carta não cortarem */
+  
+  /* Centraliza se tiver poucas, alinha à esquerda se tiver muitas */
+  justify-content: flex-start; 
+  
+  /* Altura mínima para o efeito de hover não ser cortado */
+  min-height: 180px; 
+  
+  /* ESCONDER A BARRA DE ROLAGEM (Estética) */
+  /* Funciona no Chrome/Safari/Edge */
+  &::-webkit-scrollbar {
+    height: 8px; /* Se quiser ver a barra, aumente. Se quiser invisível, deixe 0px */
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 215, 0, 0.3); /* Um dourado bem suave */
+    border-radius: 4px;
+  }
+}
+
+/* Ajuste no espaçamento das cartas para caberem melhor */
+.player-hand app-card {
+  flex-shrink: 0; /* Impede que a carta seja esmagada */
+  margin-right: -30px; /* Aumentei a sobreposição (era margin-left, mudei a lógica) */
+  transition: all 0.3s ease-out;
+  
+  /* Quando passa o mouse, a carta sobe e se destaca */
+  &:hover {
+    transform: translateY(-25px) scale(1.1);
+    z-index: 100; /* Garante que ela fique na frente de todas */
+    margin-right: 0; /* Empurra as outras levemente para dar espaço */
+    margin-left: 10px;
+  }
+}
+   
+   /* =========================================
+      ÁREA DE BATALHA (CAMPO)
+      ========================================= */
+   .battle-area {
+     flex: 1;
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+     position: relative;
+   }
+   
+   .message-box {
+     font-size: 1.5rem;
+     font-weight: bold;
+     color: $gold;
+     text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+     margin-bottom: 20px;
+     text-align: center;
+     height: 40px;
+   }
+   
+   .battle-slot {
+     width: 160px;
+     height: 220px;
+     border: 2px dashed rgba(255, 255, 255, 0.1);
+     border-radius: 10px;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+   }
+   
+   /* =========================================
+      TELA DE LOGIN
+      ========================================= */
+   .login-screen {
+     height: 100vh;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     background: radial-gradient(circle at center, #2a2a2a, #000);
+   }
+   
+   .login-box {
+     background: rgba(0, 0, 0, 0.8);
+     padding: 40px;
+     border-radius: 20px;
+     border: 1px solid #444;
+     text-align: center;
+     box-shadow: 0 0 50px rgba(0,0,0,0.8);
+     max-width: 800px;
+     width: 90%;
+   }
+   
+   .game-title { font-size: 3rem; color: $gold; margin-bottom: 10px; text-shadow: 2px 2px 0 #000; }
+   .subtitle { color: #888; letter-spacing: 5px; margin-bottom: 30px; }
+   
+   input {
+     background: transparent;
+     border: none;
+     border-bottom: 2px solid #555;
+     color: white;
+     font-size: 1.5rem;
+     padding: 10px;
+     text-align: center;
+     outline: none;
+     width: 100%;
+     margin-bottom: 30px;
+     text-transform: uppercase;
+     &:focus { border-color: $gold; }
+   }
+   
+   .class-selection {
+     display: flex;
+     gap: 20px;
+     justify-content: center;
+     margin-bottom: 40px;
+     flex-wrap: wrap;
+   }
+   
+   .class-card {
+     background: #222;
+     border: 2px solid #444;
+     border-radius: 10px;
+     padding: 20px;
+     width: 140px;
+     cursor: pointer;
+     transition: all 0.3s;
+     
+     &:hover { background: #2a2a2a; transform: translateY(-5px); }
+     
+     &.selected {
+       border-color: $gold;
+       background: rgba(255, 215, 0, 0.1);
+       box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+       transform: scale(1.05);
+     }
+     
+     .icon { font-size: 2.5rem; margin-bottom: 10px; }
+     .name { font-weight: bold; color: white; margin-bottom: 5px; }
+     .desc { font-size: 0.8rem; color: #aaa; margin-bottom: 10px; }
+     .stat { font-size: 0.9rem; color: $gold; font-weight: bold; border-top: 1px solid #444; padding-top: 5px; }
+   }
+   
+   .btn-start {
+     background: $gold;
+     color: #000;
+     font-size: 1.2rem;
+     font-weight: bold;
+     padding: 15px 50px;
+     border: none;
+     border-radius: 50px;
+     cursor: pointer;
+     transition: all 0.3s;
+     text-transform: uppercase;
+     letter-spacing: 2px;
+   
+     &:hover:not(:disabled) {
+       transform: scale(1.05);
+       box-shadow: 0 0 30px $gold;
+     }
+     
+     &:disabled {
+       background: #444;
+       color: #777;
+       cursor: not-allowed;
+       opacity: 0.7;
+     }
+   }
+   
+   /* =========================================
+      MODAL FINAL
+      ========================================= */
+   .modal-overlay {
+     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+     background: rgba(0,0,0,0.9);
+     display: flex; justify-content: center; align-items: center; z-index: 999;
+   }
+   
+   .modal-content {
+     background: #1a1a1a;
+     padding: 40px;
+     border: 2px solid $gold;
+     text-align: center;
+     border-radius: 15px;
+     
+     h1 { color: $gold; font-size: 3rem; margin-bottom: 10px; }
+     p { font-size: 1.5rem; margin-bottom: 30px; }
+     
+     button {
+       margin: 10px;
+       padding: 10px 20px;
+       font-size: 1rem;
+       font-weight: bold;
+       cursor: pointer;
+       border: none;
+       border-radius: 5px;
+       
+       &.btn-action { background: $gold; color: black; }
+       &.secondary { background: #444; color: white; }
+       
+       &:hover { transform: scale(1.1); }
+     }
+   }
