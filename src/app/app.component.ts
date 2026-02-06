@@ -92,6 +92,7 @@ iniciarPartida() {
       this.comprarCarta('jogador');
       this.comprarCarta('oponente');
     }
+
   }
 
   // ========================================================
@@ -127,10 +128,10 @@ iniciarPartida() {
     this.cartaInimigoSelecionada = cartaInimigo;
     this.turnoAtual = 'batalha';
     this.mensagemBatalha = `Oponente escolheu ${cartaInimigo.nome}. Batalha!`;
+  }
 
-    setTimeout(() => {
-      this.resolverTurno();
-    }, 900);
+  resolverTurnoManual() {
+    this.resolverTurno();
   }
 
   resolverTurno() {
@@ -140,6 +141,8 @@ iniciarPartida() {
 
     this.removerDaMao(this.maoDoJogador, this.cartaJogadorSelecionada);
     this.removerDaMao(this.maoDoOponente, this.cartaInimigoSelecionada);
+    this.cartaJogadorSelecionada = null;
+    this.cartaInimigoSelecionada = null;
 
     this.checkFimDeJogo();
     if (this.jogoTerminou) return;
