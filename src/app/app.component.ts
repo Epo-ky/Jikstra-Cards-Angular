@@ -102,13 +102,19 @@ iniciarPartida() {
   // 2. SISTEMA DE COMBATE E TURNOS
   // ========================================================
 
-  atacar(cartaJogador: Card) {
+  selecionarCartaJogador(cartaJogador: Card) {
     if (this.jogoTerminou || this.turnoAtual !== 'jogador') return;
 
     this.limparJogadaAutomatica();
-    this.turnoAtual = 'oponente';
     this.cartaJogadorSelecionada = cartaJogador;
-    this.mensagemBatalha = `${this.nomeJogador} escolheu ${cartaJogador.nome}. Oponente está escolhendo...`;
+    this.mensagemBatalha = `${this.nomeJogador} escolheu ${cartaJogador.nome}. Clique em PASSAR.`;
+  }
+
+  passarTurno() {
+    if (this.jogoTerminou || this.turnoAtual !== 'jogador' || !this.cartaJogadorSelecionada) return;
+
+    this.turnoAtual = 'oponente';
+    this.mensagemBatalha = `${this.nomeJogador} passou. Oponente está escolhendo...`;
 
     setTimeout(() => {
       this.turnoDoOponente();
@@ -331,7 +337,8 @@ iniciarPartida() {
       const index = Math.floor(Math.random() * this.maoDoJogador.length);
       const carta = this.maoDoJogador[index];
       if (carta) {
-        this.atacar(carta);
+        this.selecionarCartaJogador(carta);
+        this.passarTurno();
       }
     }, this.TEMPO_JOGADA_AUTOMATICA_MS);
   }

@@ -37,6 +37,13 @@
     <div class="battle-actions">
       <button
         type="button"
+        class="pass-button"
+        [disabled]="!(turnoAtual === 'jogador' && cartaJogadorSelecionada)"
+        (click)="passarTurno()">
+        PASSAR
+      </button>
+      <button
+        type="button"
         class="resolve-button"
         [disabled]="!(turnoAtual === 'batalha' && cartaJogadorSelecionada && cartaInimigoSelecionada)"
         (click)="resolverTurnoManual()">
@@ -58,7 +65,7 @@
         *ngFor="let card of maoDoJogador" 
         [cardData]="card"
         class="player-card-wrapper"
-        (click)="atacar(card)">
+        (click)="selecionarCartaJogador(card)">
       </app-card>
     </div>
 
