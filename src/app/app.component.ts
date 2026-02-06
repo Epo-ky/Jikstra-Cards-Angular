@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CardComponent, Card } from './card/card';
 
@@ -35,6 +35,7 @@ export class AppComponent {
   maoDoOponente: Card[] = [];
   jogadaAutomaticaTimeoutId: ReturnType<typeof setTimeout> | null = null;
   readonly TEMPO_JOGADA_AUTOMATICA_MS = 1200;
+  readonly TEMPO_JOGADA_OPONENTE_MS = 2000;
 
   // ========================================================
   // 1. CONFIGURAÇÃO INICIAL (LOGIN E CLASSES)
@@ -47,6 +48,8 @@ export class AppComponent {
     { id: 'mago', nome: 'Mago', icone: '🔮', desc: 'Dano Mágico, Estratégia' },
     { id: 'ladino', nome: 'Ladino', icone: '⚡', desc: 'Velocidade, Críticos' }
   ];
+
+  constructor(private readonly cdr: ChangeDetectorRef) {}
 
   selecionarClasse(classe: any) {
     // LÓGICA DE TOGGLE: Se clicar no que já está, zera (null). Se for novo, troca.
@@ -66,7 +69,7 @@ export class AppComponent {
     }
   }
 
-iniciarPartida() {
+  iniciarPartida() {
     this.jogoIniciado = true;
     this.vidaJogador = this.VIDA_INICIAL;
     this.vidaInimigo = this.VIDA_INICIAL;
@@ -102,17 +105,18 @@ iniciarPartida() {
   // 2. SISTEMA DE COMBATE E TURNOS
   // ========================================================
 
-  atacar(cartaJogador: Card) {
+  selecionarCartaJogador(cartaJogador: Card) {
     if (this.jogoTerminou || this.turnoAtual !== 'jogador') return;
 
     this.limparJogadaAutomatica();
-    this.turnoAtual = 'oponente';
     this.cartaJogadorSelecionada = cartaJogador;
+    this.turnoAtual = 'oponente';
     this.mensagemBatalha = `${this.nomeJogador} escolheu ${cartaJogador.nome}. Oponente está escolhendo...`;
+    this.cdr.detectChanges();
 
     setTimeout(() => {
       this.turnoDoOponente();
-    }, 900);
+    }, this.TEMPO_JOGADA_OPONENTE_MS);
   }
 
   turnoDoOponente() {
@@ -132,6 +136,7 @@ iniciarPartida() {
     this.cartaInimigoSelecionada = cartaInimigo;
     this.turnoAtual = 'batalha';
     this.mensagemBatalha = `Oponente escolheu ${cartaInimigo.nome}. Batalha!`;
+    this.cdr.detectChanges();
   }
 
   resolverTurnoManual() {
@@ -172,6 +177,7 @@ iniciarPartida() {
     this.cartaJogadorSelecionada = null;
     this.turnoAtual = 'jogador';
     this.agendarJogadaAutomatica();
+    this.cdr.detectChanges();
 
     // Se mesmo tentando recarregar o deck der erro (muito raro com a nova logica)
     if (!comprouJ && this.maoDoJogador.length === 0) {
@@ -331,7 +337,7 @@ iniciarPartida() {
       const index = Math.floor(Math.random() * this.maoDoJogador.length);
       const carta = this.maoDoJogador[index];
       if (carta) {
-        this.atacar(carta);
+        this.selecionarCartaJogador(carta);
       }
     }, this.TEMPO_JOGADA_AUTOMATICA_MS);
   }
