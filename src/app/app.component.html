@@ -6,9 +6,9 @@
     <h2>INIMIGO</h2>
     
     <div class="health-bar-container">
-      <div class="health-bar enemy-hp" [style.width.%]="(vidaInimigo > 100 ? 100 : vidaInimigo)"></div>
+      <div class="health-bar enemy-hp" [style.width.%]="(vidaInimigo / VIDA_INICIAL) * 100"></div>
     </div>
-    <p class="hp-text">{{ vidaInimigo }} / 100</p>
+    <p class="hp-text">{{ vidaInimigo }} / {{ VIDA_INICIAL }}</p>
 
     <div class="hand enemy-hand">
       <div class="card-back" *ngFor="let c of maoDoOponente">
@@ -54,9 +54,9 @@
     </div>
 
     <div class="health-bar-container">
-      <div class="health-bar player-hp" [style.width.%]="(vidaJogador > 120 ? 100 : (vidaJogador / 1.2))"></div>
+      <div class="health-bar player-hp" [style.width.%]="(vidaJogador / VIDA_INICIAL) * 100"></div>
     </div>
-    <p class="hp-text">{{ vidaJogador }} HP</p>
+    <p class="hp-text">{{ vidaJogador }} / {{ VIDA_INICIAL }}</p>
     
     <h2>{{ nomeJogador }}</h2>
   </div>
@@ -94,7 +94,7 @@
           <div class="icon">{{ c.icone }}</div>
           <div class="name">{{ c.nome }}</div>
           <div class="desc">{{ c.desc }}</div>
-          <div class="stat">HP INICIAL: {{ c.vida }}</div>
+          <div class="stat">HP INICIAL: {{ VIDA_INICIAL }}</div>
         </div>
       </div>
 
