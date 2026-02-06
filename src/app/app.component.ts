@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CardComponent, Card } from './card/card';
 
@@ -34,9 +34,7 @@ export class AppComponent {
   maoDoJogador: Card[] = [];
   maoDoOponente: Card[] = [];
   jogadaAutomaticaTimeoutId: ReturnType<typeof setTimeout> | null = null;
-  autoPassTimeoutId: ReturnType<typeof setTimeout> | null = null;
   readonly TEMPO_JOGADA_AUTOMATICA_MS = 1200;
-  readonly TEMPO_AUTO_PASSAR_MS = 3000;
   readonly TEMPO_JOGADA_OPONENTE_MS = 2000;
 
   // ========================================================
@@ -50,6 +48,8 @@ export class AppComponent {
     { id: 'mago', nome: 'Mago', icone: '🔮', desc: 'Dano Mágico, Estratégia' },
     { id: 'ladino', nome: 'Ladino', icone: '⚡', desc: 'Velocidade, Críticos' }
   ];
+
+  constructor(private readonly cdr: ChangeDetectorRef) {}
 
   selecionarClasse(classe: any) {
     // LÓGICA DE TOGGLE: Se clicar no que já está, zera (null). Se for novo, troca.
@@ -74,7 +74,6 @@ export class AppComponent {
     this.vidaJogador = this.VIDA_INICIAL;
     this.vidaInimigo = this.VIDA_INICIAL;
     
-    this.limparAutoPassagem();
     this.jogoTerminou = false;
     this.turnoAtual = 'jogador';
     this.cartaJogadorSelecionada = null;
@@ -110,18 +109,10 @@ export class AppComponent {
     if (this.jogoTerminou || this.turnoAtual !== 'jogador') return;
 
     this.limparJogadaAutomatica();
-    this.limparAutoPassagem();
     this.cartaJogadorSelecionada = cartaJogador;
-    this.mensagemBatalha = `${this.nomeJogador} escolheu ${cartaJogador.nome}. Clique em PASSAR.`;
-    this.agendarAutoPassagem();
-  }
-
-  passarTurno() {
-    if (this.jogoTerminou || this.turnoAtual !== 'jogador' || !this.cartaJogadorSelecionada) return;
-
-    this.limparAutoPassagem();
     this.turnoAtual = 'oponente';
-    this.mensagemBatalha = `${this.nomeJogador} passou. Oponente está escolhendo...`;
+    this.mensagemBatalha = `${this.nomeJogador} escolheu ${cartaJogador.nome}. Oponente está escolhendo...`;
+    this.cdr.detectChanges();
 
     setTimeout(() => {
       this.turnoDoOponente();
@@ -145,6 +136,7 @@ export class AppComponent {
     this.cartaInimigoSelecionada = cartaInimigo;
     this.turnoAtual = 'batalha';
     this.mensagemBatalha = `Oponente escolheu ${cartaInimigo.nome}. Batalha!`;
+    this.cdr.detectChanges();
   }
 
   resolverTurnoManual() {
@@ -169,7 +161,6 @@ export class AppComponent {
 
   faseDeCompra() {
     this.cartaInimigoSelecionada = null; // Esconde a carta do inimigo
-    this.limparAutoPassagem();
     
     // Tenta comprar 1 carta para VOCÊ
     const comprouJ = this.comprarCarta('jogador');
@@ -186,6 +177,7 @@ export class AppComponent {
     this.cartaJogadorSelecionada = null;
     this.turnoAtual = 'jogador';
     this.agendarJogadaAutomatica();
+    this.cdr.detectChanges();
 
     // Se mesmo tentando recarregar o deck der erro (muito raro com a nova logica)
     if (!comprouJ && this.maoDoJogador.length === 0) {
@@ -325,7 +317,6 @@ export class AppComponent {
 
   voltarParaLogin() {
     this.limparJogadaAutomatica();
-    this.limparAutoPassagem();
     this.jogoIniciado = false;
     this.nomeJogador = '';
     this.classeSelecionada = null; // Reseta a classe também
@@ -333,18 +324,7 @@ export class AppComponent {
   
   reiniciar() {
     this.limparJogadaAutomatica();
-    this.limparAutoPassagem();
     this.iniciarPartida();
-  }
-
-  agendarAutoPassagem() {
-    if (this.jogoTerminou || this.turnoAtual !== 'jogador' || !this.cartaJogadorSelecionada) return;
-
-    this.limparAutoPassagem();
-    this.autoPassTimeoutId = setTimeout(() => {
-      if (this.jogoTerminou || this.turnoAtual !== 'jogador' || !this.cartaJogadorSelecionada) return;
-      this.passarTurno();
-    }, this.TEMPO_AUTO_PASSAR_MS);
   }
 
   agendarJogadaAutomatica() {
@@ -358,7 +338,6 @@ export class AppComponent {
       const carta = this.maoDoJogador[index];
       if (carta) {
         this.selecionarCartaJogador(carta);
-        this.passarTurno();
       }
     }, this.TEMPO_JOGADA_AUTOMATICA_MS);
   }
@@ -367,13 +346,6 @@ export class AppComponent {
     if (this.jogadaAutomaticaTimeoutId) {
       clearTimeout(this.jogadaAutomaticaTimeoutId);
       this.jogadaAutomaticaTimeoutId = null;
-    }
-  }
-
-  limparAutoPassagem() {
-    if (this.autoPassTimeoutId) {
-      clearTimeout(this.autoPassTimeoutId);
-      this.autoPassTimeoutId = null;
     }
   }
 }
