@@ -132,10 +132,10 @@ iniciarPartida() {
     this.cartaInimigoSelecionada = cartaInimigo;
     this.turnoAtual = 'batalha';
     this.mensagemBatalha = `Oponente escolheu ${cartaInimigo.nome}. Batalha!`;
+  }
 
-    setTimeout(() => {
-      this.resolverTurno();
-    }, 900);
+  resolverTurnoManual() {
+    this.resolverTurno();
   }
 
   resolverTurno() {
