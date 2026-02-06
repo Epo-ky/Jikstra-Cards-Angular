@@ -34,12 +34,16 @@
                  [isEnemy]="true">
         </app-card>
     </div>
-    <button
-      class="btn-action"
-      *ngIf="turnoAtual === 'batalha' && cartaJogadorSelecionada && cartaInimigoSelecionada"
-      (click)="resolverTurnoManual()">
-      RESOLVER COMBATE
-    </button>
+    <div
+      class="battle-actions"
+      *ngIf="turnoAtual === 'batalha' && cartaJogadorSelecionada && cartaInimigoSelecionada">
+      <button
+        type="button"
+        class="resolve-button"
+        (click)="resolverTurnoManual()">
+        RESOLVER COMBATE
+      </button>
+    </div>
 
   </div>
 
