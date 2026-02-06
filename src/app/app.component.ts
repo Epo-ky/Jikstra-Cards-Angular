@@ -34,7 +34,10 @@ export class AppComponent {
   maoDoJogador: Card[] = [];
   maoDoOponente: Card[] = [];
   jogadaAutomaticaTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  autoPassTimeoutId: ReturnType<typeof setTimeout> | null = null;
   readonly TEMPO_JOGADA_AUTOMATICA_MS = 1200;
+  readonly TEMPO_AUTO_PASSAR_MS = 3000;
+  readonly TEMPO_JOGADA_OPONENTE_MS = 2000;
 
   // ========================================================
   // 1. CONFIGURAÇÃO INICIAL (LOGIN E CLASSES)
@@ -66,11 +69,12 @@ export class AppComponent {
     }
   }
 
-iniciarPartida() {
+  iniciarPartida() {
     this.jogoIniciado = true;
     this.vidaJogador = this.VIDA_INICIAL;
     this.vidaInimigo = this.VIDA_INICIAL;
     
+    this.limparAutoPassagem();
     this.jogoTerminou = false;
     this.turnoAtual = 'jogador';
     this.cartaJogadorSelecionada = null;
@@ -106,19 +110,22 @@ iniciarPartida() {
     if (this.jogoTerminou || this.turnoAtual !== 'jogador') return;
 
     this.limparJogadaAutomatica();
+    this.limparAutoPassagem();
     this.cartaJogadorSelecionada = cartaJogador;
     this.mensagemBatalha = `${this.nomeJogador} escolheu ${cartaJogador.nome}. Clique em PASSAR.`;
+    this.agendarAutoPassagem();
   }
 
   passarTurno() {
     if (this.jogoTerminou || this.turnoAtual !== 'jogador' || !this.cartaJogadorSelecionada) return;
 
+    this.limparAutoPassagem();
     this.turnoAtual = 'oponente';
     this.mensagemBatalha = `${this.nomeJogador} passou. Oponente está escolhendo...`;
 
     setTimeout(() => {
       this.turnoDoOponente();
-    }, 900);
+    }, this.TEMPO_JOGADA_OPONENTE_MS);
   }
 
   turnoDoOponente() {
@@ -162,6 +169,7 @@ iniciarPartida() {
 
   faseDeCompra() {
     this.cartaInimigoSelecionada = null; // Esconde a carta do inimigo
+    this.limparAutoPassagem();
     
     // Tenta comprar 1 carta para VOCÊ
     const comprouJ = this.comprarCarta('jogador');
@@ -317,6 +325,7 @@ iniciarPartida() {
 
   voltarParaLogin() {
     this.limparJogadaAutomatica();
+    this.limparAutoPassagem();
     this.jogoIniciado = false;
     this.nomeJogador = '';
     this.classeSelecionada = null; // Reseta a classe também
@@ -324,7 +333,18 @@ iniciarPartida() {
   
   reiniciar() {
     this.limparJogadaAutomatica();
+    this.limparAutoPassagem();
     this.iniciarPartida();
+  }
+
+  agendarAutoPassagem() {
+    if (this.jogoTerminou || this.turnoAtual !== 'jogador' || !this.cartaJogadorSelecionada) return;
+
+    this.limparAutoPassagem();
+    this.autoPassTimeoutId = setTimeout(() => {
+      if (this.jogoTerminou || this.turnoAtual !== 'jogador' || !this.cartaJogadorSelecionada) return;
+      this.passarTurno();
+    }, this.TEMPO_AUTO_PASSAR_MS);
   }
 
   agendarJogadaAutomatica() {
@@ -347,6 +367,13 @@ iniciarPartida() {
     if (this.jogadaAutomaticaTimeoutId) {
       clearTimeout(this.jogadaAutomaticaTimeoutId);
       this.jogadaAutomaticaTimeoutId = null;
+    }
+  }
+
+  limparAutoPassagem() {
+    if (this.autoPassTimeoutId) {
+      clearTimeout(this.autoPassTimeoutId);
+      this.autoPassTimeoutId = null;
     }
   }
 }
