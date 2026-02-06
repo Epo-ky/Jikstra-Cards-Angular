@@ -10,14 +10,20 @@ import { CardComponent, Card } from './card/card';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
+  readonly VIDA_INICIAL = 60;
+  readonly DANO_DERROTA = 10;
+  readonly TAMANHO_MINIMO_DECK = 18;
+
   jogoIniciado = false;
   nomeJogador = '';
   
-  vidaJogador = 50;
-  vidaInimigo = 50;
+  vidaJogador = this.VIDA_INICIAL;
+  vidaInimigo = this.VIDA_INICIAL;
   
-  mensagemBatalha = 'A batalha começou! Sua vez.';
+  mensagemBatalha = 'A batalha começou! Escolha sua carta.';
   jogoTerminou = false;
+  turnoAtual: 'jogador' | 'oponente' | 'batalha' = 'jogador';
+  cartaJogadorSelecionada: Card | null = null;
   
   cartaInimigoSelecionada: Card | null = null; 
 
@@ -34,11 +40,10 @@ export class AppComponent {
   
   classeSelecionada: any = null;
   
-  // Adicionei o atributo 'vida' em cada classe para fazer diferença no jogo
   classesDisponiveis = [
-    { id: 'guerreiro', nome: 'Guerreiro', icone: '⚔️', desc: 'Alta Vida, Força Bruta', vida: 120 },
-    { id: 'mago', nome: 'Mago', icone: '🔮', desc: 'Dano Mágico, Estratégia', vida: 80 },
-    { id: 'ladino', nome: 'Ladino', icone: '⚡', desc: 'Velocidade, Críticos', vida: 90 }
+    { id: 'guerreiro', nome: 'Guerreiro', icone: '⚔️', desc: 'Alta Defesa, Força Bruta' },
+    { id: 'mago', nome: 'Mago', icone: '🔮', desc: 'Dano Mágico, Estratégia' },
+    { id: 'ladino', nome: 'Ladino', icone: '⚡', desc: 'Velocidade, Críticos' }
   ];
 
   selecionarClasse(classe: any) {
@@ -61,16 +66,14 @@ export class AppComponent {
 
 iniciarPartida() {
     this.jogoIniciado = true;
-    
-    // AQUI ESTAVA O PERIGO: Usamos a vida da classe ou 100 como segurança
-    this.vidaJogador = this.classeSelecionada ? this.classeSelecionada.vida : 100;
-    this.vidaInimigo = 100;
+    this.vidaJogador = this.VIDA_INICIAL;
+    this.vidaInimigo = this.VIDA_INICIAL;
     
     this.jogoTerminou = false;
+    this.turnoAtual = 'jogador';
+    this.cartaJogadorSelecionada = null;
     this.cartaInimigoSelecionada = null;
-    this.mensagemBatalha = "Turno 1: Fase de Compra!";
-
-    // ... (o resto da função continua igual) ...
+    this.mensagemBatalha = 'Seu turno: escolha sua carta.';
 
     // 1. Cria os Decks (18 cartas cada)
     this.deckJogador = this.gerarDeckBase();
@@ -96,13 +99,23 @@ iniciarPartida() {
   // ========================================================
 
   atacar(cartaJogador: Card) {
-    if (this.jogoTerminou) return;
+    if (this.jogoTerminou || this.turnoAtual !== 'jogador') return;
 
-    // --- PASSO 1: Oponente escolhe carta da mão dele ---
+    this.turnoAtual = 'oponente';
+    this.cartaJogadorSelecionada = cartaJogador;
+    this.mensagemBatalha = `${this.nomeJogador} escolheu ${cartaJogador.nome}. Oponente está escolhendo...`;
+
+    setTimeout(() => {
+      this.turnoDoOponente();
+    }, 900);
+  }
+
+  turnoDoOponente() {
+    if (this.jogoTerminou || !this.cartaJogadorSelecionada) return;
+
     if (this.maoDoOponente.length === 0) {
-       // Tenta comprar uma de emergência
        const comprou = this.comprarCarta('oponente');
-       if(!comprou) {
+       if (!comprou) {
           this.mensagemBatalha = "Oponente sem cartas! Vitória por W.O.";
           this.jogoTerminou = true;
           return;
@@ -112,19 +125,25 @@ iniciarPartida() {
     const indexInimigo = Math.floor(Math.random() * this.maoDoOponente.length);
     const cartaInimigo = this.maoDoOponente[indexInimigo];
     this.cartaInimigoSelecionada = cartaInimigo;
+    this.turnoAtual = 'batalha';
+    this.mensagemBatalha = `Oponente escolheu ${cartaInimigo.nome}. Batalha!`;
 
-    // --- PASSO 2: Resolução do Combate ---
-    this.resolverCombate(cartaJogador, cartaInimigo);
+    setTimeout(() => {
+      this.resolverTurno();
+    }, 900);
+  }
 
-    // --- PASSO 3: Descarte ---
-    this.removerDaMao(this.maoDoJogador, cartaJogador);
-    this.removerDaMao(this.maoDoOponente, cartaInimigo);
+  resolverTurno() {
+    if (this.jogoTerminou || !this.cartaJogadorSelecionada || !this.cartaInimigoSelecionada) return;
 
-    // --- PASSO 4: Verificar se alguém morreu ---
+    this.resolverCombate(this.cartaJogadorSelecionada, this.cartaInimigoSelecionada);
+
+    this.removerDaMao(this.maoDoJogador, this.cartaJogadorSelecionada);
+    this.removerDaMao(this.maoDoOponente, this.cartaInimigoSelecionada);
+
     this.checkFimDeJogo();
     if (this.jogoTerminou) return;
 
-    // --- PASSO 5: FASE DE COMPRA AUTOMÁTICA ---
     setTimeout(() => {
       this.faseDeCompra();
     }, 1500);
@@ -139,11 +158,14 @@ iniciarPartida() {
     // Tenta comprar 1 carta para o INIMIGO
     const comprouO = this.comprarCarta('oponente');
 
-    if (comprouJ) {
-      this.mensagemBatalha = "Sua vez! (Nova carta comprada)";
+    if (comprouJ && comprouO) {
+      this.mensagemBatalha = 'Novo turno: escolha sua carta.';
     } else {
-      this.mensagemBatalha = "Recarregando Deck..."; 
+      this.mensagemBatalha = 'Recarregando deck...'; 
     }
+
+    this.cartaJogadorSelecionada = null;
+    this.turnoAtual = 'jogador';
 
     // Se mesmo tentando recarregar o deck der erro (muito raro com a nova logica)
     if (!comprouJ && this.maoDoJogador.length === 0) {
@@ -187,6 +209,10 @@ iniciarPartida() {
     deck.push({ ...deck[7] });
     deck.push({ ...deck[2] });
     deck.push({ ...deck[9] });
+
+    while (deck.length < this.TAMANHO_MINIMO_DECK) {
+      deck.push({ ...deck[deck.length % 14] });
+    }
 
     return deck;
   }
@@ -257,7 +283,7 @@ iniciarPartida() {
     }
 
     if (!empate) {
-      jogadorVenceu ? this.vidaInimigo -= 30 : this.vidaJogador -= 30;
+      jogadorVenceu ? this.vidaInimigo -= this.DANO_DERROTA : this.vidaJogador -= this.DANO_DERROTA;
     }
   }
 
