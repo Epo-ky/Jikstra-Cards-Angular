@@ -133,7 +133,7 @@ iniciarPartida() {
     const cartaInimigo = this.maoDoOponente[indexInimigo];
     this.cartaInimigoSelecionada = cartaInimigo;
     this.turnoAtual = 'batalha';
-    this.mensagemBatalha = `Oponente escolheu ${cartaInimigo.nome}. Batalha!`;
+    this.mensagemBatalha = `Oponente escolheu ${cartaInimigo.nome}. Clique em Resolução.`;
   }
 
   resolverTurnoManual() {
