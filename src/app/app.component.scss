@@ -205,9 +205,13 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 
-  .resolve-button {
+  .resolve-button,
+  .pass-button {
     background: linear-gradient(135deg, #f5d76e, $gold);
     border: 2px solid rgba(255, 215, 0, 0.6);
     color: #1b1200;
@@ -239,6 +243,10 @@
       cursor: not-allowed;
       transform: none;
     }
+  }
+
+  .pass-button {
+    background: linear-gradient(135deg, #caa24a, #e4c066);
   }
    
    .message-box {
