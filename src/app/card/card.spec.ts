@@ -1,19 +1,29 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Card } from './card';
+import { CardComponent } from './card';
 
-describe('Card', () => {
-  let component: Card;
-  let fixture: ComponentFixture<Card>;
+describe('CardComponent', () => {
+  let component: CardComponent;
+  let fixture: ComponentFixture<CardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Card]
+      imports: [CardComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Card);
+    fixture = TestBed.createComponent(CardComponent);
     component = fixture.componentInstance;
+    component.cardData = {
+      nome: 'Teste',
+      descricao: 'Carta de teste',
+      strong: 1,
+      speed: 1,
+      intelligence: 1,
+      imagemUrl: 'https://example.com/teste.jpg',
+      tipo: 'força'
+    };
+    fixture.detectChanges();
     await fixture.whenStable();
   });
 
