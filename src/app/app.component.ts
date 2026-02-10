@@ -33,6 +33,8 @@ export class AppComponent {
   
   maoDoJogador: Card[] = [];
   maoDoOponente: Card[] = [];
+  resolucaoAutomaticaTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  readonly TEMPO_RESOLUCAO_AUTOMATICA_MS = 900;
 
   // ========================================================
   // 1. CONFIGURAÇÃO INICIAL (LOGIN E CLASSES)
@@ -65,6 +67,7 @@ export class AppComponent {
   }
 
 iniciarPartida() {
+    this.limparResolucaoAutomatica();
     this.jogoIniciado = true;
     this.vidaJogador = this.VIDA_INICIAL;
     this.vidaInimigo = this.VIDA_INICIAL;
@@ -132,9 +135,16 @@ iniciarPartida() {
     this.cartaInimigoSelecionada = cartaInimigo;
     this.turnoAtual = 'batalha';
     this.mensagemBatalha = `Oponente escolheu ${cartaInimigo.nome}. Modo de resolução.`;
+
+    this.limparResolucaoAutomatica();
+    this.resolucaoAutomaticaTimeoutId = setTimeout(() => {
+      if (this.jogoTerminou || this.turnoAtual !== 'batalha') return;
+      this.resolverTurno();
+    }, this.TEMPO_RESOLUCAO_AUTOMATICA_MS);
   }
 
   resolverTurnoManual() {
+    this.limparResolucaoAutomatica();
     this.resolverTurno();
   }
 
@@ -296,22 +306,33 @@ iniciarPartida() {
         this.vidaInimigo = 0; 
         this.mensagemBatalha = "VITÓRIA SUPREMA!"; 
         this.jogoTerminou = true; 
+        this.limparResolucaoAutomatica();
     }
     
     if (this.vidaJogador <= 0) { 
         this.vidaJogador = 0; 
         this.mensagemBatalha = "GAME OVER..."; 
         this.jogoTerminou = true; 
+        this.limparResolucaoAutomatica();
     }
   }
 
   voltarParaLogin() {
+    this.limparResolucaoAutomatica();
     this.jogoIniciado = false;
     this.nomeJogador = '';
     this.classeSelecionada = null; // Reseta a classe também
   }
   
   reiniciar() {
+    this.limparResolucaoAutomatica();
     this.iniciarPartida();
+  }
+
+  limparResolucaoAutomatica() {
+    if (this.resolucaoAutomaticaTimeoutId) {
+      clearTimeout(this.resolucaoAutomaticaTimeoutId);
+      this.resolucaoAutomaticaTimeoutId = null;
+    }
   }
 }
