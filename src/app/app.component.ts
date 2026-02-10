@@ -34,7 +34,7 @@ export class AppComponent {
   maoDoJogador: Card[] = [];
   maoDoOponente: Card[] = [];
   resolucaoAutomaticaTimeoutId: ReturnType<typeof setTimeout> | null = null;
-  readonly TEMPO_RESOLUCAO_AUTOMATICA_MS = 900;
+  readonly TEMPO_RESOLUCAO_AUTOMATICA_MS = 700;
 
   // ========================================================
   // 1. CONFIGURAÇÃO INICIAL (LOGIN E CLASSES)
@@ -134,18 +134,13 @@ iniciarPartida() {
     const cartaInimigo = this.maoDoOponente[indexInimigo];
     this.cartaInimigoSelecionada = cartaInimigo;
     this.turnoAtual = 'batalha';
-    this.mensagemBatalha = `Oponente escolheu ${cartaInimigo.nome}. Modo de resolução.`;
+    this.mensagemBatalha = `Oponente escolheu ${cartaInimigo.nome}. Resolvendo...`;
 
     this.limparResolucaoAutomatica();
     this.resolucaoAutomaticaTimeoutId = setTimeout(() => {
       if (this.jogoTerminou || this.turnoAtual !== 'batalha') return;
       this.resolverTurno();
     }, this.TEMPO_RESOLUCAO_AUTOMATICA_MS);
-  }
-
-  resolverTurnoManual() {
-    this.limparResolucaoAutomatica();
-    this.resolverTurno();
   }
 
   resolverTurno() {
