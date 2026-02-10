@@ -34,14 +34,8 @@
                  [isEnemy]="true">
         </app-card>
     </div>
-    <div class="battle-actions">
-      <button
-        type="button"
-        class="resolve-button"
-        [disabled]="!(turnoAtual === 'batalha' && cartaJogadorSelecionada && cartaInimigoSelecionada)"
-        (click)="resolverTurnoManual()">
-        RESOLUÇÃO
-      </button>
+    <div class="battle-actions" *ngIf="turnoAtual === 'batalha'">
+      <span class="resolve-button" aria-live="polite">RESOLVENDO AUTOMATICAMENTE...</span>
     </div>
 
   </div>
@@ -58,7 +52,7 @@
         *ngFor="let card of maoDoJogador" 
         [cardData]="card"
         class="player-card-wrapper"
-        (click)="atacar(card)">
+        (click)="selecionarCartaJogador(card)">
       </app-card>
     </div>
 

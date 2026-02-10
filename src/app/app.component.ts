@@ -33,8 +33,8 @@ export class AppComponent {
   
   maoDoJogador: Card[] = [];
   maoDoOponente: Card[] = [];
-  jogadaAutomaticaTimeoutId: ReturnType<typeof setTimeout> | null = null;
-  readonly TEMPO_JOGADA_AUTOMATICA_MS = 1200;
+  resolucaoAutomaticaTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  readonly TEMPO_RESOLUCAO_AUTOMATICA_MS = 700;
 
   // ========================================================
   // 1. CONFIGURAÇÃO INICIAL (LOGIN E CLASSES)
@@ -67,6 +67,7 @@ export class AppComponent {
   }
 
 iniciarPartida() {
+    this.limparResolucaoAutomatica();
     this.jogoIniciado = true;
     this.vidaJogador = this.VIDA_INICIAL;
     this.vidaInimigo = this.VIDA_INICIAL;
@@ -95,7 +96,6 @@ iniciarPartida() {
       this.comprarCarta('oponente');
     }
 
-    this.agendarJogadaAutomatica();
   }
 
   // ========================================================
@@ -105,7 +105,6 @@ iniciarPartida() {
   atacar(cartaJogador: Card) {
     if (this.jogoTerminou || this.turnoAtual !== 'jogador') return;
 
-    this.limparJogadaAutomatica();
     this.turnoAtual = 'oponente';
     this.cartaJogadorSelecionada = cartaJogador;
     this.mensagemBatalha = `${this.nomeJogador} escolheu ${cartaJogador.nome}. Oponente está escolhendo...`;
@@ -113,6 +112,10 @@ iniciarPartida() {
     setTimeout(() => {
       this.turnoDoOponente();
     }, 900);
+  }
+
+  selecionarCartaJogador(cartaJogador: Card) {
+    this.atacar(cartaJogador);
   }
 
   turnoDoOponente() {
@@ -131,11 +134,13 @@ iniciarPartida() {
     const cartaInimigo = this.maoDoOponente[indexInimigo];
     this.cartaInimigoSelecionada = cartaInimigo;
     this.turnoAtual = 'batalha';
-    this.mensagemBatalha = `Oponente escolheu ${cartaInimigo.nome}. Batalha!`;
-  }
+    this.mensagemBatalha = `Oponente escolheu ${cartaInimigo.nome}. Resolvendo...`;
 
-  resolverTurnoManual() {
-    this.resolverTurno();
+    this.limparResolucaoAutomatica();
+    this.resolucaoAutomaticaTimeoutId = setTimeout(() => {
+      if (this.jogoTerminou || this.turnoAtual !== 'batalha') return;
+      this.resolverTurno();
+    }, this.TEMPO_RESOLUCAO_AUTOMATICA_MS);
   }
 
   resolverTurno() {
@@ -171,8 +176,6 @@ iniciarPartida() {
 
     this.cartaJogadorSelecionada = null;
     this.turnoAtual = 'jogador';
-    this.agendarJogadaAutomatica();
-
     // Se mesmo tentando recarregar o deck der erro (muito raro com a nova logica)
     if (!comprouJ && this.maoDoJogador.length === 0) {
         this.mensagemBatalha = "Sem cartas! Você perdeu por fadiga.";
@@ -298,48 +301,33 @@ iniciarPartida() {
         this.vidaInimigo = 0; 
         this.mensagemBatalha = "VITÓRIA SUPREMA!"; 
         this.jogoTerminou = true; 
-        this.limparJogadaAutomatica();
+        this.limparResolucaoAutomatica();
     }
     
     if (this.vidaJogador <= 0) { 
         this.vidaJogador = 0; 
         this.mensagemBatalha = "GAME OVER..."; 
         this.jogoTerminou = true; 
-        this.limparJogadaAutomatica();
+        this.limparResolucaoAutomatica();
     }
   }
 
   voltarParaLogin() {
-    this.limparJogadaAutomatica();
+    this.limparResolucaoAutomatica();
     this.jogoIniciado = false;
     this.nomeJogador = '';
     this.classeSelecionada = null; // Reseta a classe também
   }
   
   reiniciar() {
-    this.limparJogadaAutomatica();
+    this.limparResolucaoAutomatica();
     this.iniciarPartida();
   }
 
-  agendarJogadaAutomatica() {
-    if (this.jogoTerminou || this.turnoAtual !== 'jogador') return;
-    if (this.maoDoJogador.length === 0) return;
-
-    this.limparJogadaAutomatica();
-    this.jogadaAutomaticaTimeoutId = setTimeout(() => {
-      if (this.jogoTerminou || this.turnoAtual !== 'jogador') return;
-      const index = Math.floor(Math.random() * this.maoDoJogador.length);
-      const carta = this.maoDoJogador[index];
-      if (carta) {
-        this.atacar(carta);
-      }
-    }, this.TEMPO_JOGADA_AUTOMATICA_MS);
-  }
-
-  limparJogadaAutomatica() {
-    if (this.jogadaAutomaticaTimeoutId) {
-      clearTimeout(this.jogadaAutomaticaTimeoutId);
-      this.jogadaAutomaticaTimeoutId = null;
+  limparResolucaoAutomatica() {
+    if (this.resolucaoAutomaticaTimeoutId) {
+      clearTimeout(this.resolucaoAutomaticaTimeoutId);
+      this.resolucaoAutomaticaTimeoutId = null;
     }
   }
 }
