@@ -111,6 +111,10 @@ iniciarPartida() {
     }, 900);
   }
 
+  selecionarCartaJogador(cartaJogador: Card) {
+    this.atacar(cartaJogador);
+  }
+
   turnoDoOponente() {
     if (this.jogoTerminou || !this.cartaJogadorSelecionada) return;
 
