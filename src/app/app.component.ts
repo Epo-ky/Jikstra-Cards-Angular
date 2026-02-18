@@ -127,11 +127,56 @@ iniciarPartida() {
        }
     }
 
-    const indexInimigo = Math.floor(Math.random() * this.maoDoOponente.length);
+    const indexInimigo = this.escolherCartaOponenteComUtilidade();
     const cartaInimigo = this.maoDoOponente[indexInimigo];
     this.cartaInimigoSelecionada = cartaInimigo;
     this.turnoAtual = 'batalha';
     this.mensagemBatalha = `Oponente escolheu ${cartaInimigo.nome}. Batalha!`;
+  }
+
+  escolherCartaOponenteComUtilidade(): number {
+    const vidaOponenteBaixa = this.vidaInimigo <= this.DANO_DERROTA;
+    const hpJogador = this.vidaJogador;
+    let melhorIndice = 0;
+    let melhorNota = Number.NEGATIVE_INFINITY;
+
+    this.maoDoOponente.forEach((carta, indice) => {
+      const nota = this.calcularUtilidadeCarta(carta, hpJogador, vidaOponenteBaixa);
+      if (nota > melhorNota) {
+        melhorNota = nota;
+        melhorIndice = indice;
+      }
+    });
+
+    return melhorIndice;
+  }
+
+  calcularUtilidadeCarta(carta: Card, hpJogador: number, vidaOponenteBaixa: boolean): number {
+    let nota = 0;
+
+    if (carta.tipo === 'força') {
+      nota = carta.strong * 1.2;
+    } else if (carta.tipo === 'velocidade') {
+      nota = carta.speed * 1.1;
+    } else {
+      nota = carta.intelligence * 1.15;
+    }
+
+    // Priorização de finalização: se vencer reduz 10 de vida e pode encerrar a partida.
+    if (hpJogador <= this.DANO_DERROTA) {
+      nota += 10_000;
+    }
+
+    // Em baixa vida, favorece cartas consistentes (maior atributo médio).
+    if (vidaOponenteBaixa) {
+      const mediaAtributos = (carta.strong + carta.speed + carta.intelligence) / 3;
+      nota += mediaAtributos * 2;
+    }
+
+    // Leve variação para não ficar 100% robótico.
+    nota += Math.random() * 3;
+
+    return nota;
   }
 
   resolverTurnoManual() {
