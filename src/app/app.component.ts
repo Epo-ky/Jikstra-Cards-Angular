@@ -115,6 +115,11 @@ iniciarPartida() {
     }, 900);
   }
 
+  // Compatibilidade com templates antigos que ainda chamam selecionarCartaJogador(card).
+  selecionarCartaJogador(cartaJogador: Card) {
+    this.atacar(cartaJogador);
+  }
+
   turnoDoOponente() {
     if (this.jogoTerminou || !this.cartaJogadorSelecionada) return;
 
