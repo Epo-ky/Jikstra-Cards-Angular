@@ -34,7 +34,11 @@ export class AppComponent {
   maoDoJogador: Card[] = [];
   maoDoOponente: Card[] = [];
   jogadaAutomaticaTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  resolucaoBatalhaTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  faseCompraTimeoutId: ReturnType<typeof setTimeout> | null = null;
   readonly TEMPO_JOGADA_AUTOMATICA_MS = 1200;
+  readonly TEMPO_RESOLUCAO_BATALHA_MS = 1000;
+  readonly TEMPO_FASE_COMPRA_MS = 1500;
 
   // ========================================================
   // 1. CONFIGURAÇÃO INICIAL (LOGIN E CLASSES)
@@ -76,6 +80,8 @@ iniciarPartida() {
     this.cartaJogadorSelecionada = null;
     this.cartaInimigoSelecionada = null;
     this.mensagemBatalha = 'Seu turno: escolha sua carta.';
+    this.limparResolucaoDaBatalhaPendente();
+    this.limparFaseCompraPendente();
 
     // 1. Cria os Decks (18 cartas cada)
     this.deckJogador = this.gerarDeckBase();
@@ -137,6 +143,7 @@ iniciarPartida() {
     this.cartaInimigoSelecionada = cartaInimigo;
     this.turnoAtual = 'batalha';
     this.mensagemBatalha = `Oponente escolheu ${cartaInimigo.nome}. Batalha!`;
+    this.agendarResolucaoDaBatalha();
   }
 
   escolherCartaOponenteComUtilidade(): number {
@@ -189,6 +196,7 @@ iniciarPartida() {
   }
 
   resolverTurno() {
+    this.limparResolucaoDaBatalhaPendente();
     if (this.jogoTerminou || !this.cartaJogadorSelecionada || !this.cartaInimigoSelecionada) return;
 
     this.resolverCombate(this.cartaJogadorSelecionada, this.cartaInimigoSelecionada);
@@ -199,9 +207,34 @@ iniciarPartida() {
     this.checkFimDeJogo();
     if (this.jogoTerminou) return;
 
-    setTimeout(() => {
+    this.limparFaseCompraPendente();
+    this.faseCompraTimeoutId = setTimeout(() => {
+      this.faseCompraTimeoutId = null;
       this.faseDeCompra();
-    }, 1500);
+    }, this.TEMPO_FASE_COMPRA_MS);
+  }
+
+
+  agendarResolucaoDaBatalha() {
+    this.limparResolucaoDaBatalhaPendente();
+    this.resolucaoBatalhaTimeoutId = setTimeout(() => {
+      this.resolucaoBatalhaTimeoutId = null;
+      this.resolverTurno();
+    }, this.TEMPO_RESOLUCAO_BATALHA_MS);
+  }
+
+  limparResolucaoDaBatalhaPendente() {
+    if (this.resolucaoBatalhaTimeoutId) {
+      clearTimeout(this.resolucaoBatalhaTimeoutId);
+      this.resolucaoBatalhaTimeoutId = null;
+    }
+  }
+
+  limparFaseCompraPendente() {
+    if (this.faseCompraTimeoutId) {
+      clearTimeout(this.faseCompraTimeoutId);
+      this.faseCompraTimeoutId = null;
+    }
   }
 
   faseDeCompra() {
@@ -349,6 +382,8 @@ iniciarPartida() {
         this.mensagemBatalha = "VITÓRIA SUPREMA!"; 
         this.jogoTerminou = true; 
         this.limparJogadaAutomatica();
+        this.limparResolucaoDaBatalhaPendente();
+        this.limparFaseCompraPendente();
     }
     
     if (this.vidaJogador <= 0) { 
@@ -356,11 +391,15 @@ iniciarPartida() {
         this.mensagemBatalha = "GAME OVER..."; 
         this.jogoTerminou = true; 
         this.limparJogadaAutomatica();
+        this.limparResolucaoDaBatalhaPendente();
+        this.limparFaseCompraPendente();
     }
   }
 
   voltarParaLogin() {
     this.limparJogadaAutomatica();
+    this.limparResolucaoDaBatalhaPendente();
+    this.limparFaseCompraPendente();
     this.jogoIniciado = false;
     this.nomeJogador = '';
     this.classeSelecionada = null; // Reseta a classe também
@@ -368,6 +407,8 @@ iniciarPartida() {
   
   reiniciar() {
     this.limparJogadaAutomatica();
+    this.limparResolucaoDaBatalhaPendente();
+    this.limparFaseCompraPendente();
     this.iniciarPartida();
   }
 
