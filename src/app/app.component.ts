@@ -236,23 +236,29 @@ iniciarPartida() {
         this.deckJogador = this.gerarDeckBase();
         this.embaralhar(this.deckJogador);
       }
-      const carta = this.deckJogador.pop();
+      const carta = this.puxarDoTopo(this.deckJogador);
       if (carta) {
         this.maoDoJogador.push(carta);
-        return true; 
+        return true;
       }
     } else {
       if (this.deckOponente.length === 0) {
         this.deckOponente = this.gerarDeckBase();
         this.embaralhar(this.deckOponente);
       }
-      const carta = this.deckOponente.pop();
+      const carta = this.puxarDoTopo(this.deckOponente);
       if (carta) {
         this.maoDoOponente.push(carta);
         return true;
       }
     }
     return false;
+  }
+
+  // Mecânica complementar ao Fisher-Yates:
+  // o deck continua embaralhado, mas a compra sempre vem do topo (primeiro índice).
+  puxarDoTopo(deck: Card[]): Card | undefined {
+    return deck.shift();
   }
 
   removerDaMao(mao: Card[], cartaParaRemover: Card) {
