@@ -1,0 +1,30 @@
+<div class="card-base">
+  
+  <div *ngIf="virada" class="card-verso">
+    <div class="interrogacao">?</div>
+  </div>
+
+  <div *ngIf="!virada" class="card-frente" [ngClass]="cardData.tipo">
+    
+    <div class="type-badge">
+      <span *ngIf="cardData.tipo === 'força'">🛡️ FORÇA</span>
+      <span *ngIf="cardData.tipo === 'velocidade'">⚡ VELOCIDADE</span>
+      <span *ngIf="cardData.tipo === 'magia'">🔮 MAGIA</span>
+    </div>
+
+    <div class="header">{{ cardData.nome }}</div>
+
+    <div class="img-container">
+      <img [src]="cardData.imagemUrl" alt="Monstro">
+    </div>
+
+    <div class="desc">{{ cardData.descricao }}</div>
+
+    <div class="stats">
+      <span [class.destaque-stat]="cardData.tipo === 'força'">⚔️ {{ cardData.strong }}</span>
+      <span [class.destaque-stat]="cardData.tipo === 'velocidade'">💨 {{ cardData.speed }}</span>
+      <span [class.destaque-stat]="cardData.tipo === 'magia'">🧠 {{ cardData.intelligence }}</span>
+    </div>
+  </div>
+
+</div>
