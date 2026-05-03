@@ -60,6 +60,7 @@ ng test
 **Dica:** pressione `Ctrl+D` durante o jogo para abrir o painel de debug com o log de rodadas em tempo real.
 
 ## Estrutura
+
 src/
 └── app/
 ├── app.component.ts   # Lógica principal: fases, combate, IA, deck
