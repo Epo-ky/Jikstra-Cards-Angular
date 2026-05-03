@@ -1,59 +1,69 @@
-# CardGameVisual
+# Jikstra TCG
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.2.
+> Card game de duelo em turnos com sistema de tipos e IA adversária, construído com Angular 21.
 
-## Development server
+![Tela de Login](./screenshots/login.png)
+![Gameplay](./screenshots/gameplay.png)
 
-To start a local development server, run:
+## Sobre o Projeto
+
+Jikstra TCG é um jogo de cartas digital onde o jogador enfrenta uma IA em duelos por turnos. Cada carta possui três atributos — **Força**, **Velocidade** e **Magia** — que se relacionam em um sistema de vantagens cíclicas (semelhante ao pedra-papel-tesoura). O jogador escolhe sua classe, compra cartas do deck e seleciona qual jogar a cada rodada antes que o tempo acabe.
+
+## Tecnologias
+
+- **Angular 21** — standalone components, SSR via Express / `@angular/ssr`
+- **TypeScript 5.9**
+- **RxJS 7.8**
+- **SCSS**
+- **Vitest** — testes unitários
+
+## Sistema de Jogo
+
+**Classes disponíveis**
+| Classe | Estilo |
+|---|---|
+| Guerreiro | Alta Defesa, Força Bruta |
+| Mago | Dano Mágico, Estratégia |
+| Ladino | Velocidade, Críticos |
+
+**Triângulo de tipos**
+Força > Velocidade > Magia > Força
+
+**Fases por rodada**
+1. **Draw Phase** — ambos compram uma carta do deck
+2. **Main Phase** — jogador tem 30s para escolher sua carta; IA escolhe em 1s
+3. **Battle Phase** — cartas são comparadas e o perdedor perde 10 HP
+4. **End Phase** — campo é limpo, próxima rodada começa
+
+O deck é gerado com **Fisher-Yates shuffle**. Se o deck esgotar, um novo é gerado automaticamente.
+
+## Como Rodar
 
 ```bash
+# Instalar dependências
+npm install
+
+# Servidor de desenvolvimento
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Acesse `http://localhost:4200/`.
 
 ```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
+# Build de produção
 ng build
-```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
+# Testes
 ng test
 ```
 
-## Running end-to-end tests
+**Dica:** pressione `Ctrl+D` durante o jogo para abrir o painel de debug com o log de rodadas em tempo real.
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Estrutura
+src/
+└── app/
+├── app.component.ts   # Lógica principal: fases, combate, IA, deck
+├── app.component.html # Template do jogo e tela de login
+├── app.component.scss # Estilos
+└── card/
+└── card.ts        # Componente e interface de carta
