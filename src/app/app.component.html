@@ -9,13 +9,11 @@
       <div class="health-bar enemy-hp" [style.width.%]="(vidaInimigo / VIDA_INICIAL) * 100"></div>
     </div>
     <p class="hp-text">{{ vidaInimigo }} / {{ VIDA_INICIAL }}</p>
-
     <div class="hand enemy-hand">
       <div class="card-back" *ngFor="let c of maoDoOponente">
         <div class="inner-design"></div>
       </div>
     </div>
-
     <div class="deck enemy-deck">
       <span>DECK</span>
       <strong>{{ deckOponente.length }}</strong>
@@ -23,45 +21,30 @@
   </div>
 
   <div class="battle-area">
-    
     <div class="message-box" [ngClass]="{'animate': mensagemBatalha}">
       {{ mensagemBatalha }}
     </div>
-
     <div class="battle-slot enemy-slot">
-        <app-card *ngIf="cartaInimigoSelecionada" 
-                 [cardData]="cartaInimigoSelecionada" 
-                 [isEnemy]="true">
-        </app-card>
+      <app-card *ngIf="cartaInimigoSelecionada" 
+               [cardData]="cartaInimigoSelecionada" 
+               [isEnemy]="true">
+      </app-card>
     </div>
-    <div class="battle-actions">
-      <button
-        type="button"
-        class="resolve-button"
-        [disabled]="!(turnoAtual === 'batalha' && cartaJogadorSelecionada && cartaInimigoSelecionada)"
-        (click)="resolverTurnoManual()">
-        RESOLUÇÃO
-      </button>
-    </div>
-
   </div>
 
   <div class="player-area">
-    
     <div class="deck player-deck">
       <span>DECK</span>
       <strong>{{ deckJogador.length }}</strong>
     </div>
-
     <div class="hand player-hand">
       <app-card 
         *ngFor="let card of maoDoJogador" 
         [cardData]="card"
         class="player-card-wrapper"
-        (click)="atacar(card)">
+        (click)="selecionarCarta(card)">
       </app-card>
     </div>
-
     <div class="health-bar-container">
       <div class="health-bar player-hp" [style.width.%]="(vidaJogador / VIDA_INICIAL) * 100"></div>
     </div>
@@ -75,12 +58,11 @@
       <h1>FIM DE JOGO</h1>
       <p class="result-msg">{{ mensagemBatalha }}</p>
       <div class="modal-buttons">
-          <button class="btn-action" (click)="reiniciar()">JOGAR NOVAMENTE</button>
-          <button class="btn-action secondary" (click)="voltarParaLogin()">MENU PRINCIPAL</button>
+        <button class="btn-action" (click)="reiniciar()">JOGAR NOVAMENTE</button>
+        <button class="btn-action secondary" (click)="voltarParaLogin()">MENU PRINCIPAL</button>
       </div>
     </div>
   </div>
-
 </div>
 
 <ng-template #telaLogin>
@@ -99,7 +81,6 @@
           *ngFor="let c of classesDisponiveis"
           [class.selected]="classeSelecionada === c"
           (click)="selecionarClasse(c)">
-          
           <div class="icon">{{ c.icone }}</div>
           <div class="name">{{ c.nome }}</div>
           <div class="desc">{{ c.desc }}</div>
@@ -113,7 +94,6 @@
         (click)="entrarNoJogo(nomeInput.value)">
         INICIAR DUELO
       </button>
-      
     </div>
   </div>
 </ng-template>
