@@ -298,6 +298,8 @@ export class AppComponent {
       { nome: 'Soncericyan',       descricao: 'Ilusão fatal.',         strong: 4,  speed: 4,  intelligence: 9,  imagemUrl: 'https://i.pinimg.com/736x/98/58/94/985894fd3c01473c1687232ae346afb8.jpg', tipo: 'magia' },
       { nome: 'Frieren',           descricao: 'A Maga.',               strong: 2,  speed: 4,  intelligence: 10, imagemUrl: 'https://i.pinimg.com/736x/3e/a2/77/3ea27726a1525cd55c5754afae791ac6.jpg', tipo: 'magia' },
       { nome: 'Bomb', descricao: 'Fúria da gigante verde.', strong: 10, speed: 6, intelligence: 2, imagemUrl: 'cards/bomb.png', tipo: 'força' },
+      { nome: 'Zunis', descricao: 'Delinquente dos mares.', strong: 5, speed: 4, intelligence: 7, imagemUrl: 'cards/zunis.png', tipo: 'inteligência' },
+      { nome: 'Dylan', descricao: 'O lobo guerreiro.', strong: 7, speed: 6, intelligence: 3, imagemUrl: 'cards/dylan.png', tipo: 'força' },
     ];
 
     deck.push({ ...deck[5] }, { ...deck[1] }, { ...deck[7] }, { ...deck[2] }, { ...deck[9] });
