@@ -297,6 +297,7 @@ export class AppComponent {
       { nome: 'Coruja Sábia',      descricao: 'Vê tudo.',              strong: 2,  speed: 6,  intelligence: 8,  imagemUrl: 'https://i.pinimg.com/1200x/dd/13/a0/dd13a0e6f097517cb7466673337553c0.jpg', tipo: 'magia' },
       { nome: 'Soncericyan',       descricao: 'Ilusão fatal.',         strong: 4,  speed: 4,  intelligence: 9,  imagemUrl: 'https://i.pinimg.com/736x/98/58/94/985894fd3c01473c1687232ae346afb8.jpg', tipo: 'magia' },
       { nome: 'Frieren',           descricao: 'A Maga.',               strong: 2,  speed: 4,  intelligence: 10, imagemUrl: 'https://i.pinimg.com/736x/3e/a2/77/3ea27726a1525cd55c5754afae791ac6.jpg', tipo: 'magia' },
+      { nome: 'Bomb', descricao: 'Fúria da gigante verde.', strong: 10, speed: 6, intelligence: 2, imagemUrl: 'cards/bomb.png', tipo: 'força' },
     ];
 
     deck.push({ ...deck[5] }, { ...deck[1] }, { ...deck[7] }, { ...deck[2] }, { ...deck[9] });
