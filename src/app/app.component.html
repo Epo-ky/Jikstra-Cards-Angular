@@ -25,7 +25,7 @@
       {{ mensagemBatalha }}
     </div>
     <div class="battle-slot enemy-slot">
-      <app-card *ngIf="cartaInimigoSelecionada" 
+      <app-card *ngIf="cartaInimigoSelecionada && faseAtual === 'battle'"
                [cardData]="cartaInimigoSelecionada" 
                [isEnemy]="true">
       </app-card>
