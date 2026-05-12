@@ -299,6 +299,7 @@ export class AppComponent {
       { nome: 'Frieren',           descricao: 'A Maga.',               strong: 2,  speed: 4,  intelligence: 10, imagemUrl: 'https://i.pinimg.com/736x/3e/a2/77/3ea27726a1525cd55c5754afae791ac6.jpg', tipo: 'magia' },
       { nome: 'Bomb', descricao: 'Fúria da gigante verde.', strong: 10, speed: 6, intelligence: 2, imagemUrl: 'cards/bomb.png', tipo: 'força' },
       { nome: 'Zunis', descricao: 'Delinquente dos mares.', strong: 5, speed: 4, intelligence: 7, imagemUrl: 'cards/zunis.png', tipo: 'inteligência' },
+      { nome: 'Lucius', descricao: 'O conhecimento é poder.', strong: 2, speed: 5, intelligence: 8, imagemUrl: 'cards/lucius.png', tipo: 'magia' },
       { nome: 'Dylan', descricao: 'O lobo guerreiro.', strong: 7, speed: 6, intelligence: 3, imagemUrl: 'cards/dylan.png', tipo: 'força' },
     ];
 
