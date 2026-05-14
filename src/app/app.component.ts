@@ -25,13 +25,17 @@ export class AppComponent {
   vidaInimigo = this.VIDA_INICIAL;
   mensagemBatalha = '';
   jogoTerminou = false;
-  faseAtual: 'draw' | 'main' | 'battle' | 'end' = 'draw';
+  faseAtual: 'draw' | 'magic' | 'main' | 'battle' | 'end' = 'draw';
   cartaJogadorSelecionada: Card | null = null;
   cartaInimigoSelecionada: Card | null = null;
   deckJogador: Card[] = [];
   deckOponente: Card[] = [];
   maoDoJogador: Card[] = [];
   maoDoOponente: Card[] = [];
+
+  espelhoAtivo = false;
+  dobrarAtributoAtivo = false;
+  sabotagemAtiva = false;
 
   private timerJogador: ReturnType<typeof setTimeout> | null = null;
   private timerIA: ReturnType<typeof setTimeout> | null = null;
@@ -57,10 +61,17 @@ export class AppComponent {
     if (this.debugLog.length > 60) this.debugLog.pop();
   }
 
-  // Helper central: atualiza estado E força o Angular a ver a mudança
   private atualizar(fn: () => void) {
     fn();
     this.cdr.detectChanges();
+  }
+
+  get cartasMagicasNaMao(): Card[] {
+    return this.maoDoJogador.filter(c => c.tipo === 'magica');
+  }
+
+  get cartasMonstroNaMao(): Card[] {
+    return this.maoDoJogador.filter(c => c.tipo !== 'magica');
   }
 
   // ========================================================
@@ -94,11 +105,14 @@ export class AppComponent {
     this.jogoTerminou = false;
     this.cartaJogadorSelecionada = null;
     this.cartaInimigoSelecionada = null;
+    this.espelhoAtivo = false;
+    this.dobrarAtributoAtivo = false;
+    this.sabotagemAtiva = false;
     this.debugLog = [];
     this.rodadaAtual = 0;
 
     this.deckJogador = this.gerarDeckBase();
-    this.deckOponente = this.gerarDeckBase();
+    this.deckOponente = this.gerarDeckOponente();
     this.embaralhar(this.deckJogador);
     this.embaralhar(this.deckOponente);
     this.maoDoJogador = [];
@@ -116,7 +130,7 @@ export class AppComponent {
   }
 
   // ========================================================
-  // FASES — toda mudança de estado passa pelo atualizar()
+  // FASES
   // ========================================================
 
   drawPhase() {
@@ -130,48 +144,121 @@ export class AppComponent {
       this.log(`DRAW: Mão jogador: ${this.maoDoJogador.map(c => c.nome).join(', ')}`);
     });
 
-    setTimeout(() => this.mainPhase(), 500);
+    setTimeout(() => this.magicPhase(), 500);
+  }
+
+  magicPhase() {
+    const temMagia = this.cartasMagicasNaMao.length > 0;
+
+    if (!temMagia) {
+      this.mainPhase();
+      return;
+    }
+
+    this.atualizar(() => {
+      this.faseAtual = 'magic';
+      this.mensagemBatalha = '✨ Magic Phase — use uma carta mágica ou pule! (5s)';
+      this.log(`MAGIC: Jogador tem ${this.cartasMagicasNaMao.length} carta(s) mágica(s)`);
+    });
+
+    // Auto-skip após 5s
+    this.timerJogador = setTimeout(() => {
+      if (this.faseAtual === 'magic') {
+        this.log('MAGIC: Auto-pulado');
+        this.mainPhase();
+      }
+    }, 5000);
+  }
+
+  usarCartaMagica(carta: Card) {
+    if (this.faseAtual !== 'magic') return;
+    this.limparTimerJogador();
+
+    this.atualizar(() => {
+      switch (carta.efeito) {
+        case 'cura':
+          this.vidaJogador = Math.min(this.VIDA_INICIAL, this.vidaJogador + 10);
+          this.mensagemBatalha = `💚 Cura! +10 HP → ${this.vidaJogador} HP`;
+          this.log(`MAGIC: Cura → Vida: ${this.vidaJogador}`);
+          break;
+        case 'espelho':
+          this.espelhoAtivo = true;
+          if (this.maoDoOponente.length === 0) this.comprarCarta('oponente');
+          const idx = Math.floor(Math.random() * this.maoDoOponente.length);
+          this.cartaInimigoSelecionada = this.maoDoOponente[idx];
+          this.mensagemBatalha = `🪞 Espelho! Oponente vai usar: ${this.cartaInimigoSelecionada.nome}`;
+          this.log(`MAGIC: Espelho → Oponente: ${this.cartaInimigoSelecionada.nome}`);
+          break;
+        case 'dobro':
+          this.dobrarAtributoAtivo = true;
+          this.mensagemBatalha = `⚡ Dobro ativado! Seu atributo será dobrado!`;
+          this.log('MAGIC: Dobro ativado');
+          break;
+        case 'sabotagem':
+          this.sabotagemAtiva = true;
+          this.mensagemBatalha = `💀 Sabotagem! Oponente ficará mais fraco!`;
+          this.log('MAGIC: Sabotagem ativada');
+          break;
+      }
+      this.removerDaMao(this.maoDoJogador, carta);
+    });
+
+    setTimeout(() => this.mainPhase(), 900);
+  }
+
+  pularMagia() {
+    this.limparTimerJogador();
+    this.log('MAGIC: Pulado');
+    this.mainPhase();
   }
 
   mainPhase() {
     this.atualizar(() => {
       this.faseAtual = 'main';
       this.cartaJogadorSelecionada = null;
-      this.cartaInimigoSelecionada = null;
-      this.mensagemBatalha = '⚔️ Main Phase — escolha sua carta! (5s)';
-      this.log(`MAIN: Aguardando jogador (${this.TEMPO_ESCOLHA_MS / 1000}s)`);
+      if (!this.espelhoAtivo) this.cartaInimigoSelecionada = null;
+      this.mensagemBatalha = this.espelhoAtivo
+        ? `🪞 Espelho ativo! Oponente usará ${this.cartaInimigoSelecionada?.nome}. Escolha sua carta!`
+        : '⚔️ Main Phase — escolha sua carta!';
+      this.log(`MAIN: Aguardando jogador`);
     });
 
-    // Timer do jogador — 5s para escolher, senão auto-seleciona
+    // Auto-select do jogador após 30s
     this.timerJogador = setTimeout(() => {
       this.atualizar(() => {
         if (!this.cartaJogadorSelecionada && this.faseAtual === 'main') {
-          const index = Math.floor(Math.random() * this.maoDoJogador.length);
-          this.cartaJogadorSelecionada = this.maoDoJogador[index];
+          const monstros = this.cartasMonstroNaMao;
+          const index = Math.floor(Math.random() * monstros.length);
+          this.cartaJogadorSelecionada = monstros[index] || this.maoDoJogador[0];
           this.mensagemBatalha = `⏱️ Auto: ${this.cartaJogadorSelecionada.nome}`;
-          this.log(`MAIN: Auto-selecionado → ${this.cartaJogadorSelecionada.nome} (${this.cartaJogadorSelecionada.tipo})`);
+          this.log(`MAIN: Auto-selecionado → ${this.cartaJogadorSelecionada.nome}`);
         }
       });
       this.verificarProntoParaBatalha();
     }, this.TEMPO_ESCOLHA_MS);
 
-    // IA escolhe após 1s
-    this.timerIA = setTimeout(() => {
-      this.atualizar(() => {
-        if (this.faseAtual === 'main') {
-          if (this.maoDoOponente.length === 0) this.comprarCarta('oponente');
-          const index = Math.floor(Math.random() * this.maoDoOponente.length);
-          this.cartaInimigoSelecionada = this.maoDoOponente[index];
-          this.log(`MAIN: IA escolheu → ${this.cartaInimigoSelecionada.nome} (${this.cartaInimigoSelecionada.tipo})`);
-        }
-      });
-      this.verificarProntoParaBatalha();
-    }, this.TEMPO_IA_MS);
+    // IA escolhe após 1s (se espelho não ativou)
+    if (!this.espelhoAtivo) {
+      this.timerIA = setTimeout(() => {
+        this.atualizar(() => {
+          if (this.faseAtual === 'main') {
+            if (this.maoDoOponente.length === 0) this.comprarCarta('oponente');
+            const index = Math.floor(Math.random() * this.maoDoOponente.length);
+            this.cartaInimigoSelecionada = this.maoDoOponente[index];
+            this.log(`MAIN: IA escolheu → ${this.cartaInimigoSelecionada.nome}`);
+          }
+        });
+        this.verificarProntoParaBatalha();
+      }, this.TEMPO_IA_MS);
+    } else {
+      setTimeout(() => this.verificarProntoParaBatalha(), 100);
+    }
   }
 
   selecionarCarta(carta: Card) {
     if (this.jogoTerminou || this.faseAtual !== 'main') return;
     if (this.cartaJogadorSelecionada) return;
+    if (carta.tipo === 'magica') return;
 
     this.limparTimerJogador();
     this.atualizar(() => {
@@ -218,6 +305,9 @@ export class AppComponent {
       this.mensagemBatalha = '🔄 End Phase...';
       this.cartaJogadorSelecionada = null;
       this.cartaInimigoSelecionada = null;
+      this.espelhoAtivo = false;
+      this.dobrarAtributoAtivo = false;
+      this.sabotagemAtiva = false;
       this.log(`END: Campo limpo → próxima rodada`);
     });
 
@@ -240,6 +330,9 @@ export class AppComponent {
       if (tipoJ === 'velocidade') { valorJ = cartaJ.speed;        valorE = cartaE.speed; }
       if (tipoJ === 'magia')      { valorJ = cartaJ.intelligence; valorE = cartaE.intelligence; }
 
+      if (this.dobrarAtributoAtivo) valorJ *= 2;
+      if (this.sabotagemAtiva) valorE = Math.floor(valorE / 2);
+
       if (valorJ > valorE) jogadorVenceu = true;
       else if (valorJ === valorE) empate = true;
       this.mensagemBatalha = empate
@@ -256,6 +349,10 @@ export class AppComponent {
         ? `🏆 VENCEU! ${tipoJ} bate ${tipoE}`
         : `💀 PERDEU! ${tipoE} bate ${tipoJ}`;
     }
+
+    this.dobrarAtributoAtivo = false;
+    this.sabotagemAtiva = false;
+    this.espelhoAtivo = false;
 
     if (!empate) {
       jogadorVenceu ? this.vidaInimigo -= this.DANO_DERROTA : this.vidaJogador -= this.DANO_DERROTA;
@@ -283,35 +380,43 @@ export class AppComponent {
 
   gerarDeckBase(): Card[] {
     const deck: Card[] = [
-      { nome: 'Cavaleiro Real',    descricao: 'Esmaga ossos.',         strong: 8,  speed: 5,  intelligence: 3,  imagemUrl: 'cards/cavaleira-real.png', tipo: 'força' },
-      { nome: 'Arqueira Veloz',    descricao: 'Intocável.',            strong: 4,  speed: 9,  intelligence: 5,  imagemUrl: 'cards/arqueira-veloz.png', tipo: 'velocidade' },
-      { nome: 'Mago Sombrio',      descricao: 'Feitiço mortal.',       strong: 2,  speed: 4,  intelligence: 10, imagemUrl: 'cards/mago-sombrio.png', tipo: 'magia' },
-      { nome: 'Dragão Roxo',   descricao: 'Fúria pura.',           strong: 10, speed: 6,  intelligence: 2,  imagemUrl: 'cards/dragao-roxo.png', tipo: 'força' },
-      { nome: 'Lix',     descricao: 'Rápido e sujo.',        strong: 3,  speed: 8,  intelligence: 4,  imagemUrl: 'cards/lix.png', tipo: 'velocidade' },
-      { nome: 'Brok',     descricao: 'Pequeno e Monstro.',    strong: 9,  speed: 4,  intelligence: 3,  imagemUrl: 'cards/chapeu-vermelho.png', tipo: 'força' },
-      { nome: 'Diabo das Sombras', descricao: 'Pacto de sangue.',      strong: 8,  speed: 7,  intelligence: 5,  imagemUrl: 'cards/zenen.png', tipo: 'força' },
-      { nome: 'Sapo Monge',        descricao: 'O caminho do charco.',  strong: 5,  speed: 8,  intelligence: 6,  imagemUrl: 'cards/sapo-monge.png', tipo: 'velocidade' },
-      { nome: 'Lib, a Ligeira',    descricao: 'Bater de asas sônico.', strong: 2,  speed: 10, intelligence: 2,  imagemUrl: 'cards/lib.png', tipo: 'velocidade' },
-      { nome: 'Nante, A Mística',    descricao: 'Olhar amaldiçoado.',    strong: 3,  speed: 5,  intelligence: 9,  imagemUrl: 'cards/nante.png', tipo: 'magia' },
-      { nome: 'Água Viva Astral',  descricao: 'Choque etéreo.',        strong: 1,  speed: 3,  intelligence: 9,  imagemUrl: 'cards/aguaviva-astral.png', tipo: 'magia' },
-      { nome: 'Coruja Sábia',      descricao: 'Vê tudo.',              strong: 2,  speed: 6,  intelligence: 8,  imagemUrl: 'cards/coruja-sabia.png', tipo: 'magia' },
-      { nome: 'Soncericyan',       descricao: 'Ilusão fatal.',         strong: 4,  speed: 4,  intelligence: 9,  imagemUrl: 'cards/soncericyan.png', tipo: 'magia' },
-      { nome: 'Lyan',           descricao: 'A Maga.',               strong: 2,  speed: 4,  intelligence: 10, imagemUrl: 'cards/lyan.png', tipo: 'magia' },
-      { nome: 'Bomb', descricao: 'Fúria da gigante verde.', strong: 10, speed: 6, intelligence: 2, imagemUrl: 'cards/bomb.png', tipo: 'força' },
-      { nome: 'Zunis', descricao: 'Delinquente dos mares.', strong: 5, speed: 4, intelligence: 7, imagemUrl: 'cards/zunis.png', tipo: 'inteligência' },
-      { nome: 'Lucius', descricao: 'O conhecimento é poder.', strong: 2, speed: 5, intelligence: 8, imagemUrl: 'cards/lucius.png', tipo: 'magia' },
-      { nome: 'Dylan', descricao: 'O lobo guerreiro.', strong: 7, speed: 6, intelligence: 3, imagemUrl: 'cards/dylan.png', tipo: 'força' },
-      { nome: 'Siegfried', descricao: 'O Caçador', strong: 7, speed: 9, intelligence: 5, imagemUrl: 'cards/siegfried.png', tipo: 'speed' },
-      { nome: 'Bramstep', descricao: 'O Constructor BattleMage', strong: 7, speed: 3, intelligence: 8, imagemUrl: 'cards/bramstep.png', tipo: 'magia' },
-      { nome: 'Thorn', descricao: 'O Exilado', strong: 7, speed: 8, intelligence: 5, imagemUrl: 'cards/thorn.png', tipo: 'speed' },
-      { nome: 'Pamine', descricao: 'A Fada Preguiçosa', strong: 2, speed: 6, intelligence: 9, imagemUrl: 'cards/pamine.png', tipo: 'magia' },
+      { nome: 'Cavaleiro Real',    descricao: 'Esmaga ossos.',              strong: 8,  speed: 5,  intelligence: 3,  imagemUrl: 'cards/cavaleira-real.png',  tipo: 'força' },
+      { nome: 'Arqueira Veloz',    descricao: 'Intocável.',                 strong: 4,  speed: 9,  intelligence: 5,  imagemUrl: 'cards/arqueira-veloz.png',  tipo: 'velocidade' },
+      { nome: 'Mago Sombrio',      descricao: 'Feitiço mortal.',            strong: 2,  speed: 4,  intelligence: 10, imagemUrl: 'cards/mago-sombrio.png',    tipo: 'magia' },
+      { nome: 'Dragão Roxo',       descricao: 'Fúria pura.',                strong: 10, speed: 6,  intelligence: 2,  imagemUrl: 'cards/dragao-roxo.png',     tipo: 'força' },
+      { nome: 'Lix',               descricao: 'Rápido e sujo.',             strong: 3,  speed: 8,  intelligence: 4,  imagemUrl: 'cards/lix.png',             tipo: 'velocidade' },
+      { nome: 'Brok',              descricao: 'Pequeno e Monstro.',         strong: 9,  speed: 4,  intelligence: 3,  imagemUrl: 'cards/chapeu-vermelho.png', tipo: 'força' },
+      { nome: 'Diabo das Sombras', descricao: 'Pacto de sangue.',           strong: 8,  speed: 7,  intelligence: 5,  imagemUrl: 'cards/zenen.png',           tipo: 'força' },
+      { nome: 'Sapo Monge',        descricao: 'O caminho do charco.',       strong: 5,  speed: 8,  intelligence: 6,  imagemUrl: 'cards/sapo-monge.png',      tipo: 'velocidade' },
+      { nome: 'Lib, a Ligeira',    descricao: 'Bater de asas sônico.',      strong: 2,  speed: 10, intelligence: 2,  imagemUrl: 'cards/lib.png',             tipo: 'velocidade' },
+      { nome: 'Nante, A Mística',  descricao: 'Olhar amaldiçoado.',         strong: 3,  speed: 5,  intelligence: 9,  imagemUrl: 'cards/nante.png',           tipo: 'magia' },
+      { nome: 'Água Viva Astral',  descricao: 'Choque etéreo.',             strong: 1,  speed: 3,  intelligence: 9,  imagemUrl: 'cards/aguaviva-astral.png', tipo: 'magia' },
+      { nome: 'Coruja Sábia',      descricao: 'Vê tudo.',                   strong: 2,  speed: 6,  intelligence: 8,  imagemUrl: 'cards/coruja-sabia.png',    tipo: 'magia' },
+      { nome: 'Soncericyan',       descricao: 'Ilusão fatal.',              strong: 4,  speed: 4,  intelligence: 9,  imagemUrl: 'cards/soncericyan.png',     tipo: 'magia' },
+      { nome: 'Lyan',              descricao: 'A Maga.',                    strong: 2,  speed: 4,  intelligence: 10, imagemUrl: 'cards/lyan.png',            tipo: 'magia' },
+      { nome: 'Bomb',              descricao: 'Fúria da gigante verde.',    strong: 10, speed: 6,  intelligence: 2,  imagemUrl: 'cards/bomb.png',            tipo: 'força' },
+      { nome: 'Zunis',             descricao: 'Delinquente dos mares.',     strong: 5,  speed: 4,  intelligence: 7,  imagemUrl: 'cards/zunis.png',           tipo: 'magia' },
+      { nome: 'Lucius',            descricao: 'O conhecimento é poder.',    strong: 2,  speed: 5,  intelligence: 8,  imagemUrl: 'cards/lucius.png',          tipo: 'magia' },
+      { nome: 'Dylan',             descricao: 'O lobo guerreiro.',          strong: 7,  speed: 6,  intelligence: 3,  imagemUrl: 'cards/dylan.png',           tipo: 'força' },
+      { nome: 'Siegfried',         descricao: 'O Caçador.',                 strong: 7,  speed: 9,  intelligence: 5,  imagemUrl: 'cards/siegfried.png',       tipo: 'velocidade' },
+      { nome: 'Bramstep',          descricao: 'O Constructor BattleMage.',  strong: 7,  speed: 3,  intelligence: 8,  imagemUrl: 'cards/bramstep.png',        tipo: 'magia' },
+      { nome: 'Thorn',             descricao: 'O Exilado.',                 strong: 7,  speed: 8,  intelligence: 5,  imagemUrl: 'cards/thorn.png',           tipo: 'velocidade' },
+      { nome: 'Pamine',            descricao: 'A Fada Preguiçosa.',         strong: 2,  speed: 6,  intelligence: 9,  imagemUrl: 'cards/pamine.png',          tipo: 'magia' },
+      // Cartas Mágicas
+      { nome: 'Poção de Cura',     descricao: 'Recupera 10 HP.',               strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'cura' },
+      { nome: 'Olho de Espelho',   descricao: 'Revela a carta do oponente.',   strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'espelho' },
+      { nome: 'Fúria Dobrada',     descricao: 'Dobra seu atributo principal.', strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'dobro' },
+      { nome: 'Sabotagem Arcana',  descricao: 'Enfraquece o oponente.',        strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'sabotagem' },
     ];
 
-    deck.push({ ...deck[5] }, { ...deck[1] }, { ...deck[7] }, { ...deck[2] }, { ...deck[9] });
     while (deck.length < this.TAMANHO_MINIMO_DECK) {
-      deck.push({ ...deck[deck.length % 14] });
+      deck.push({ ...deck[deck.length % 22] });
     }
     return deck;
+  }
+
+  gerarDeckOponente(): Card[] {
+    return this.gerarDeckBase().filter(c => c.tipo !== 'magica');
   }
 
   embaralhar(array: any[]) {
@@ -327,7 +432,7 @@ export class AppComponent {
       const carta = this.puxarDoTopo(this.deckJogador);
       if (carta) { this.maoDoJogador.push(carta); return true; }
     } else {
-      if (this.deckOponente.length === 0) { this.deckOponente = this.gerarDeckBase(); this.embaralhar(this.deckOponente); }
+      if (this.deckOponente.length === 0) { this.deckOponente = this.gerarDeckOponente(); this.embaralhar(this.deckOponente); }
       const carta = this.puxarDoTopo(this.deckOponente);
       if (carta) { this.maoDoOponente.push(carta); return true; }
     }

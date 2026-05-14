@@ -4,7 +4,6 @@
   
   <div class="enemy-area">
     <h2>INIMIGO</h2>
-    
     <div class="health-bar-container">
       <div class="health-bar enemy-hp" [style.width.%]="(vidaInimigo / VIDA_INICIAL) * 100"></div>
     </div>
@@ -24,10 +23,26 @@
     <div class="message-box" [ngClass]="{'animate': mensagemBatalha}">
       {{ mensagemBatalha }}
     </div>
+
+    <!-- Magic Phase -->
+    <div class="magic-phase" *ngIf="faseAtual === 'magic'">
+      <p class="magic-title">✨ Escolha uma carta mágica para usar:</p>
+      <div class="magic-cards">
+        <app-card
+          *ngFor="let card of cartasMagicasNaMao"
+          [cardData]="card"
+          (click)="usarCartaMagica(card)">
+        </app-card>
+      </div>
+      <button class="btn-skip-magic" (click)="pularMagia()">⏩ PULAR FASE MÁGICA</button>
+    </div>
+
+    <!-- Carta do oponente (battle phase ou espelho ativo) -->
     <div class="battle-slot enemy-slot">
-      <app-card *ngIf="cartaInimigoSelecionada && faseAtual === 'battle'"
-               [cardData]="cartaInimigoSelecionada" 
-               [isEnemy]="true">
+      <app-card 
+        *ngIf="cartaInimigoSelecionada && (faseAtual === 'battle' || espelhoAtivo)"
+        [cardData]="cartaInimigoSelecionada" 
+        [isEnemy]="true">
       </app-card>
     </div>
   </div>
@@ -39,7 +54,7 @@
     </div>
     <div class="hand player-hand">
       <app-card 
-        *ngFor="let card of maoDoJogador" 
+        *ngFor="let card of cartasMonstroNaMao" 
         [cardData]="card"
         class="player-card-wrapper"
         (click)="selecionarCarta(card)">
@@ -49,7 +64,6 @@
       <div class="health-bar player-hp" [style.width.%]="(vidaJogador / VIDA_INICIAL) * 100"></div>
     </div>
     <p class="hp-text">{{ vidaJogador }} / {{ VIDA_INICIAL }}</p>
-    
     <h2>{{ nomeJogador }}</h2>
   </div>
 
@@ -70,11 +84,9 @@
     <div class="login-box">
       <h1 class="game-title">JIKSTRA TCG</h1>
       <p class="subtitle">ESCOLHA SEU DESTINO</p>
-      
       <div class="input-group">
         <input #nomeInput type="text" (input)="0" placeholder="DIGITE SEU NOME" maxlength="12">
       </div>
-
       <div class="class-selection">
         <div 
           class="class-card" 
@@ -87,7 +99,6 @@
           <div class="stat">HP INICIAL: {{ VIDA_INICIAL }}</div>
         </div>
       </div>
-
       <button 
         class="btn-start"
         [disabled]="!nomeInput.value || !classeSelecionada"

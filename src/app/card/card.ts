@@ -8,7 +8,8 @@ export interface Card {
   speed: number;
   intelligence: number;
   imagemUrl: string;
-  tipo: string;
+  tipo: 'força' | 'velocidade' | 'magia' | 'magica';
+  efeito?: 'cura' | 'espelho' | 'dobro' | 'sabotagem';
 }
 
 @Component({
@@ -21,6 +22,7 @@ export interface Card {
            'force': cardData.tipo === 'força', 
            'speed': cardData.tipo === 'velocidade', 
            'magic': cardData.tipo === 'magia',
+           'spell': cardData.tipo === 'magica',
            'enemy-mode': isEnemy
          }">
       
@@ -28,26 +30,33 @@ export interface Card {
         <div class="card-header">
           <span class="card-name">{{ cardData.nome }}</span>
           <span class="card-icon">
-            {{ cardData.tipo === 'força' ? '⚔️' : (cardData.tipo === 'velocidade' ? '🦶' : '🔮') }}
+            {{ cardData.tipo === 'força' ? '⚔️' : cardData.tipo === 'velocidade' ? '🦶' : cardData.tipo === 'magica' ? '✨' : '🔮' }}
           </span>
         </div>
 
-        <div class="card-image" [style.backgroundImage]="'url(' + cardData.imagemUrl + ')'"></div>
+        <div class="card-image" [style.backgroundImage]="'url(' + cardData.imagemUrl + ')'">
+          <div class="spell-icon" *ngIf="cardData.tipo === 'magica'">
+            {{ cardData.efeito === 'cura' ? '💚' : cardData.efeito === 'espelho' ? '🪞' : cardData.efeito === 'dobro' ? '⚡' : '💀' }}
+          </div>
+        </div>
 
         <div class="card-body">
           <p>{{ cardData.descricao }}</p>
         </div>
 
-        <div class="card-stats">
+        <div class="card-stats" *ngIf="cardData.tipo !== 'magica'">
           <div class="stat strong"><strong>👊</strong> {{ cardData.strong }}</div>
           <div class="stat speed"><strong>⚡</strong> {{ cardData.speed }}</div>
           <div class="stat int"><strong>🧠</strong> {{ cardData.intelligence }}</div>
+        </div>
+
+        <div class="spell-label" *ngIf="cardData.tipo === 'magica'">
+          CARTA MÁGICA
         </div>
       </div>
     </div>
   `,
   styles: [`
-    /* Estilo Base da Carta */
     .card {
       width: 160px;
       height: 240px;
@@ -69,15 +78,15 @@ export interface Card {
       z-index: 10;
     }
 
-    /* Cores por Tipo */
     .card.force { border-color: #e74c3c; box-shadow: 0 0 10px rgba(231, 76, 60, 0.3); }
     .card.speed { border-color: #f1c40f; box-shadow: 0 0 10px rgba(241, 196, 15, 0.3); }
     .card.magic { border-color: #9b59b6; box-shadow: 0 0 10px rgba(155, 89, 182, 0.3); }
-    
-    /* Estilo Inimigo (se precisar diferenciar visualmente depois) */
-    .card.enemy-mode {
-      border-color: #ff0000;
+    .card.spell { 
+      border-color: #00e5ff; 
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+      background: linear-gradient(135deg, #0a1628, #1a0a2e);
     }
+    .card.enemy-mode { border-color: #ff0000; }
 
     .card-inner {
       display: flex;
@@ -103,6 +112,14 @@ export interface Card {
       border-radius: 6px;
       margin-bottom: 5px;
       border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .spell-icon {
+      font-size: 3.5rem;
+      filter: drop-shadow(0 0 10px rgba(0,229,255,0.8));
     }
 
     .card-body p {
@@ -123,15 +140,21 @@ export interface Card {
       border-radius: 20px;
     }
 
-    .stat {
-      font-size: 0.8rem;
+    .stat { font-size: 0.8rem; font-weight: bold; }
+
+    .spell-label {
+      text-align: center;
+      font-size: 0.65rem;
       font-weight: bold;
+      color: #00e5ff;
+      letter-spacing: 2px;
+      background: rgba(0,229,255,0.1);
+      border-radius: 20px;
+      padding: 3px;
     }
   `]
 })
 export class CardComponent {
   @Input() cardData!: Card;
-  
-  // AQUI ESTAVA O QUE FALTAVA:
-  @Input() isEnemy: boolean = false; 
+  @Input() isEnemy: boolean = false;
 }
