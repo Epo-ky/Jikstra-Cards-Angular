@@ -301,6 +301,10 @@ export class AppComponent {
       { nome: 'Zunis', descricao: 'Delinquente dos mares.', strong: 5, speed: 4, intelligence: 7, imagemUrl: 'cards/zunis.png', tipo: 'inteligência' },
       { nome: 'Lucius', descricao: 'O conhecimento é poder.', strong: 2, speed: 5, intelligence: 8, imagemUrl: 'cards/lucius.png', tipo: 'magia' },
       { nome: 'Dylan', descricao: 'O lobo guerreiro.', strong: 7, speed: 6, intelligence: 3, imagemUrl: 'cards/dylan.png', tipo: 'força' },
+      { nome: 'Siegfried', descricao: 'O Caçador', strong: 7, speed: 9, intelligence: 5, imagemUrl: 'cards/siegfried.png', tipo: 'speed' },
+      { nome: 'Bramstep', descricao: 'O Constructor BattleMage', strong: 7, speed: 3, intelligence: 8, imagemUrl: 'cards/bramstep.png', tipo: 'magia' },
+      { nome: 'Thorn', descricao: 'O Exilado', strong: 7, speed: 8, intelligence: 5, imagemUrl: 'cards/thorn.png', tipo: 'speed' },
+      { nome: 'Pamine', descricao: 'A Fada Preguiçosa', strong: 2, speed: 6, intelligence: 9, imagemUrl: 'cards/pamine.png', tipo: 'magia' },
     ];
 
     deck.push({ ...deck[5] }, { ...deck[1] }, { ...deck[7] }, { ...deck[2] }, { ...deck[9] });
