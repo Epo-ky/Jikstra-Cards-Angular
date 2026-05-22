@@ -25,17 +25,24 @@
     </div>
 
     <!-- Magic Phase -->
-    <div class="magic-phase" *ngIf="faseAtual === 'magic'">
-      <p class="magic-title">✨ Escolha uma carta mágica para usar:</p>
-      <div class="magic-cards">
-        <app-card
-          *ngFor="let card of cartasMagicasNaMao"
-          [cardData]="card"
-          (click)="usarCartaMagica(card)">
-        </app-card>
-      </div>
-      <button class="btn-skip-magic" (click)="pularMagia()">⏩ PULAR FASE MÁGICA</button>
-    </div>
+<div class="magic-phase" *ngIf="faseAtual === 'magic'">
+  <p class="magic-title">✨ Escolha uma carta mágica para usar:</p>
+
+  <div class="magic-cards">
+    <app-card
+      *ngFor="let card of cartasMagicasNaMao"
+      [cardData]="card"
+      (click)="usarCartaMagica(card); $event.stopPropagation()">
+    </app-card>
+  </div>
+
+  <button
+    type="button"
+    class="btn-skip-magic"
+    (click)="pularMagia(); $event.stopPropagation()">
+    NÃO USAR
+  </button>
+</div>
 
     <!-- Carta do oponente (battle phase ou espelho ativo) -->
     <div class="battle-slot enemy-slot">

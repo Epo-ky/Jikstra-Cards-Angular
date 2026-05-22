@@ -1,4 +1,4 @@
-<div class="card-base">
+<div class="card-base" [class.magica]="cardData.tipo === 'magica'">
   
   <div *ngIf="virada" class="card-verso">
     <div class="interrogacao">?</div>
@@ -10,6 +10,7 @@
       <span *ngIf="cardData.tipo === 'força'">🛡️ FORÇA</span>
       <span *ngIf="cardData.tipo === 'velocidade'">⚡ VELOCIDADE</span>
       <span *ngIf="cardData.tipo === 'magia'">🔮 MAGIA</span>
+      <span *ngIf="cardData.tipo === 'magica'">✨ MÁGICA</span>
     </div>
 
     <div class="header">{{ cardData.nome }}</div>
@@ -20,11 +21,16 @@
 
     <div class="desc">{{ cardData.descricao }}</div>
 
-    <div class="stats">
+    <div class="stats" *ngIf="cardData.tipo !== 'magica'">
       <span [class.destaque-stat]="cardData.tipo === 'força'">⚔️ {{ cardData.strong }}</span>
       <span [class.destaque-stat]="cardData.tipo === 'velocidade'">💨 {{ cardData.speed }}</span>
       <span [class.destaque-stat]="cardData.tipo === 'magia'">🧠 {{ cardData.intelligence }}</span>
     </div>
+
+    <div class="stats magic-effect" *ngIf="cardData.tipo === 'magica'">
+      <span>{{ cardData.efeito === 'cura' ? '💚 CURA' : cardData.efeito === 'espelho' ? '🪞 ESPELHO' : cardData.efeito === 'dobro' ? '⚡ DOBRO' : '💀 SABOTAGEM' }}</span>
+    </div>
+
   </div>
 
 </div>
