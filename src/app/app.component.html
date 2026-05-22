@@ -75,9 +75,10 @@
   </div>
 
   <div class="modal-overlay" *ngIf="jogoTerminou">
-    <div class="modal-content">
-      <h1>FIM DE JOGO</h1>
-      <p class="result-msg">{{ mensagemBatalha }}</p>
+    <div class="modal-content" [class.vitoria]="vidaInimigo <= 0" [class.derrota]="vidaJogador <= 0">
+  <p class="modal-subtitulo">{{ vidaInimigo <= 0 ? 'FIM DE JOGO' : 'GAME OVER' }}</p>
+  <h1>{{ vidaInimigo <= 0 ? 'VITÓRIA' : 'DERROTA' }}</h1>
+  <p class="result-msg">{{ vidaInimigo <= 0 ? 'O destino sorriu para você hoje.' : mensagemBatalha }}</p>
       <div class="modal-buttons">
         <button class="btn-action" (click)="reiniciar()">JOGAR NOVAMENTE</button>
         <button class="btn-action secondary" (click)="voltarParaLogin()">MENU PRINCIPAL</button>

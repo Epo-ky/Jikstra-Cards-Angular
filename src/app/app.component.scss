@@ -426,4 +426,14 @@
        
        &:hover { transform: scale(1.1); }
      }
+     .modal-subtitulo {
+  font-size: 1rem;
+  color: #888;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+&.vitoria h1 { color: $gold; font-size: 4rem; text-shadow: 0 0 30px rgba(255, 215, 0, 0.6); }
+&.derrota h1 { color: $red; font-size: 4rem; text-shadow: 0 0 30px rgba(255, 68, 68, 0.6); }
    }
