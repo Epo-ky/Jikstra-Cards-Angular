@@ -293,6 +293,18 @@ export class AppComponent {
     this.atualizar(() => {
       this.faseAtual = 'battle';
       this.mensagemBatalha = '💥 Battle Phase!';
+      const temmonstro = this.cartaJogadorSelecionada && this.cartaInimigoSelecionada && this.maoDoJogador.some(carta => carta.tipo !== 'magica');
+
+
+      // Derrota caso não tenha monstro
+      if (!temmonstro) {
+        console.log('Suas defesas falharam! Você perdeu 10 HP.');
+        this.vidaJogador = Math.max(0, this.vidaJogador - this.DANO_DERROTA);
+        this.mensagemBatalha = '💀 Falha! Carta inválida. Você perdeu 10 HP.';
+        this.checkFimDeJogo();
+        this.log('BATTLE: Falha → Carta inválida');
+        return;
+      }
       this.log(`BATTLE: ${this.cartaJogadorSelecionada!.nome} vs ${this.cartaInimigoSelecionada!.nome}`);
 
       this.resolverCombate(this.cartaJogadorSelecionada!, this.cartaInimigoSelecionada!);
