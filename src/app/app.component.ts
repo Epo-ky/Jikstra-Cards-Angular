@@ -181,6 +181,11 @@ export class AppComponent {
           this.mensagemBatalha = `💚 Cura! +10 HP → ${this.vidaJogador} HP`;
           this.log(`MAGIC: Cura → Vida: ${this.vidaJogador}`);
           break;
+        case 'cura maior':
+          this.vidaJogador = Math.min(this.VIDA_INICIAL, this.vidaJogador + 20);
+          this.mensagemBatalha = `💚 Cura! +20 HP → ${this.vidaJogador} HP`;
+          this.log(`MAGIC: Cura → Vida: ${this.vidaJogador}`);
+          break;  
         case 'espelho':
           this.espelhoAtivo = true;
           if (this.maoDoOponente.length === 0) this.comprarCarta('oponente');
@@ -191,7 +196,7 @@ export class AppComponent {
           break;
         case 'dobro':
           this.dobrarAtributoAtivo = true;
-          this.mensagemBatalha = `⚡ Dobro ativado! Seu atributo será dobrado!`;
+          this.mensagemBatalha = `⚡ Dobro ativado! Seu atributo principal será dobrado!`;
           this.log('MAGIC: Dobro ativado');
           break;
         case 'sabotagem':
@@ -313,7 +318,7 @@ export class AppComponent {
 
     setTimeout(() => this.drawPhase(), 400);
   }
-
+  
   // ========================================================
   // COMBATE
   // ========================================================
@@ -384,7 +389,7 @@ export class AppComponent {
       { nome: 'Arqueira Veloz',    descricao: 'Intocável.',                 strong: 4,  speed: 9,  intelligence: 5,  imagemUrl: 'cards/arqueira-veloz.png',  tipo: 'velocidade' },
       { nome: 'Mago Sombrio',      descricao: 'Feitiço mortal.',            strong: 2,  speed: 4,  intelligence: 10, imagemUrl: 'cards/mago-sombrio.png',    tipo: 'magia' },
       { nome: 'Dragão Roxo',       descricao: 'Fúria pura.',                strong: 10, speed: 6,  intelligence: 2,  imagemUrl: 'cards/dragao-roxo.png',     tipo: 'força' },
-      { nome: 'Lix',               descricao: 'Rápido e sujo.',             strong: 3,  speed: 8,  intelligence: 4,  imagemUrl: 'cards/lix.png',             tipo: 'velocidade' },
+      { nome: 'Lix',               descricao: 'Rápido e sujo.',             strong: 3,  speed: 8,  intelligence: 4,  imagemUrl: 'cards/Lix.png',             tipo: 'velocidade' },
       { nome: 'Brok',              descricao: 'Pequeno e Monstro.',         strong: 9,  speed: 4,  intelligence: 3,  imagemUrl: 'cards/chapeu-vermelho.png', tipo: 'força' },
       { nome: 'Diabo das Sombras', descricao: 'Pacto de sangue.',           strong: 8,  speed: 7,  intelligence: 5,  imagemUrl: 'cards/zenen.png',           tipo: 'força' },
       { nome: 'Sapo Monge',        descricao: 'O caminho do charco.',       strong: 5,  speed: 8,  intelligence: 6,  imagemUrl: 'cards/sapo-monge.png',      tipo: 'velocidade' },
@@ -402,8 +407,10 @@ export class AppComponent {
       { nome: 'Bramstep',          descricao: 'O Constructor BattleMage.',  strong: 7,  speed: 3,  intelligence: 8,  imagemUrl: 'cards/bramstep.png',        tipo: 'magia' },
       { nome: 'Thorn',             descricao: 'O Exilado.',                 strong: 7,  speed: 8,  intelligence: 5,  imagemUrl: 'cards/thorn.png',           tipo: 'velocidade' },
       { nome: 'Pamine',            descricao: 'A Fada Preguiçosa.',         strong: 2,  speed: 6,  intelligence: 9,  imagemUrl: 'cards/pamine.png',          tipo: 'magia' },
+      { nome: 'Thigas',            descricao: 'O Goat.',         strong: 10,  speed: 10,  intelligence: 10,  imagemUrl: 'cards/thigas.png',          tipo: 'magia' },
       // Cartas Mágicas
       { nome: 'Poção de Cura',     descricao: 'Recupera 10 HP.',               strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'cura' },
+      { nome: 'Poção de Cura Maior',     descricao: 'Recupera 20 HP.',               strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'cura maior' },
       { nome: 'Olho de Espelho',   descricao: 'Revela a carta do oponente.',   strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'espelho' },
       { nome: 'Fúria Dobrada',     descricao: 'Dobra seu atributo principal.', strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'dobro' },
       { nome: 'Sabotagem Arcana',  descricao: 'Enfraquece o oponente.',        strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'sabotagem' },
