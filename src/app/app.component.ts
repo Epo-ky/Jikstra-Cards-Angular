@@ -199,6 +199,11 @@ export class AppComponent {
           this.mensagemBatalha = `⚡ Dobro ativado! Seu atributo principal será dobrado!`;
           this.log('MAGIC: Dobro ativado');
           break;
+        case 'burn':
+          this.vidaInimigo = Math.max(0, this.vidaInimigo - 10);
+          this.mensagemBatalha = `🔥 Burn! Oponente perde 10 HP → ${this.vidaInimigo} HP`;
+          this.log(`MAGIC: Burn → Vida Inimigo: ${this.vidaInimigo}`);
+          break;
         case 'sabotagem':
           this.sabotagemAtiva = true;
           this.mensagemBatalha = `💀 Sabotagem! Oponente ficará mais fraco!`;
@@ -407,7 +412,9 @@ export class AppComponent {
       { nome: 'Bramstep',          descricao: 'O Constructor BattleMage.',  strong: 7,  speed: 3,  intelligence: 8,  imagemUrl: 'cards/bramstep.png',        tipo: 'magia' },
       { nome: 'Thorn',             descricao: 'O Exilado.',                 strong: 7,  speed: 8,  intelligence: 5,  imagemUrl: 'cards/thorn.png',           tipo: 'velocidade' },
       { nome: 'Pamine',            descricao: 'A Fada Preguiçosa.',         strong: 2,  speed: 6,  intelligence: 9,  imagemUrl: 'cards/pamine.png',          tipo: 'magia' },
-      { nome: 'Thigas',            descricao: 'O Goat.',         strong: 10,  speed: 10,  intelligence: 10,  imagemUrl: 'cards/thigas.png',          tipo: 'magia' },
+      { nome: 'Thigas',            descricao: 'O Vilão.',                   strong: 10,  speed: 10,  intelligence: 10,  imagemUrl: 'cards/thigas.png',          tipo: 'magia' },
+      { nome: 'Fane',             descricao: 'A Ladra.',                    strong: 3,  speed: 8,  intelligence: 5,  imagemUrl: 'cards/fane.png',           tipo: 'velocidade' },
+  
 
       // Cartas Mágicas
       { nome: 'Poção de Cura',     descricao: 'Recupera 10 HP.',               strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'cura' },
@@ -415,6 +422,7 @@ export class AppComponent {
       { nome: 'Olho de Espelho',   descricao: 'Revela a carta do oponente.',   strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'espelho' },
       { nome: 'Fúria Dobrada',     descricao: 'Dobra seu atributo principal.', strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'dobro' },
       { nome: 'Sabotagem Arcana',  descricao: 'Enfraquece o oponente.',        strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'sabotagem' },
+      { nome: 'Burn',              descricao: 'Causa 10 de dano ao oponente.', strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'burn' }
     ];
 
     while (deck.length < this.TAMANHO_MINIMO_DECK) {

@@ -9,7 +9,7 @@ export interface Card {
   intelligence: number;
   imagemUrl: string;
   tipo: 'força' | 'velocidade' | 'magia' | 'magica';
-  efeito?: 'cura' | 'cura maior' | 'espelho' | 'dobro' | 'sabotagem';
+  efeito?: 'cura' | 'cura maior' | 'espelho' | 'dobro' | 'burn' | 'sabotagem';
 }
 
 @Component({
@@ -36,10 +36,11 @@ export interface Card {
 
         <div class="card-image" [style.backgroundImage]="'url(' + cardData.imagemUrl + ')'">
           <div class="spell-icon" *ngIf="cardData.tipo === 'magica'">
-            {{ cardData.efeito === 'cura' ? '💚' : cardData.efeito === 'cura maior' ? '❤️' : cardData.efeito === 'espelho' ? '🪞' : cardData.efeito === 'dobro' ? '⚡' : '💀' }}
-          </div>
+            {{ cardData.efeito === 'cura' ? '💚' : cardData.efeito === 'cura maior' ? '❤️' : cardData.efeito === 'espelho' ? '🪞' : cardData.efeito === 'dobro' ? '⚡' : cardData.efeito === 'burn' ? '🔥' : '' }}
         </div>
 
+        </div>
+        <div class="card-image" [style.backgroundImagem]="'url(' + cardData.imagemUrl + ')'">
         <div class="card-body">
           <p>{{ cardData.descricao }}</p>
         </div>
