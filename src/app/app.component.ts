@@ -81,7 +81,7 @@ export class AppComponent {
   classesDisponiveis = [
     { id: 'guerreiro', nome: 'Guerreiro', icone: '⚔️', desc: 'Alta Defesa, Força Bruta' },
     { id: 'mago',      nome: 'Mago',      icone: '🔮', desc: 'Dano Mágico, Estratégia' },
-    { id: 'ladino',    nome: 'Ladino',    icone: '⚡', desc: 'Velocidade, Críticos' }
+    { id: 'ladino',    nome: 'Ladino',    icone: '🗡️', desc: 'Velocidade, Críticos' }
   ];
 
   selecionarClasse(classe: any) {
@@ -408,9 +408,10 @@ export class AppComponent {
       { nome: 'Thorn',             descricao: 'O Exilado.',                 strong: 7,  speed: 8,  intelligence: 5,  imagemUrl: 'cards/thorn.png',           tipo: 'velocidade' },
       { nome: 'Pamine',            descricao: 'A Fada Preguiçosa.',         strong: 2,  speed: 6,  intelligence: 9,  imagemUrl: 'cards/pamine.png',          tipo: 'magia' },
       { nome: 'Thigas',            descricao: 'O Goat.',         strong: 10,  speed: 10,  intelligence: 10,  imagemUrl: 'cards/thigas.png',          tipo: 'magia' },
+
       // Cartas Mágicas
       { nome: 'Poção de Cura',     descricao: 'Recupera 10 HP.',               strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'cura' },
-      { nome: 'Poção de Cura Maior',     descricao: 'Recupera 20 HP.',               strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'cura maior' },
+      { nome: 'Poção de Cura Maior', descricao: 'Recupera 20 HP.',               strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'cura maior' },
       { nome: 'Olho de Espelho',   descricao: 'Revela a carta do oponente.',   strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'espelho' },
       { nome: 'Fúria Dobrada',     descricao: 'Dobra seu atributo principal.', strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'dobro' },
       { nome: 'Sabotagem Arcana',  descricao: 'Enfraquece o oponente.',        strong: 0, speed: 0, intelligence: 0, imagemUrl: '', tipo: 'magica', efeito: 'sabotagem' },
