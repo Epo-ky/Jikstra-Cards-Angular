@@ -9,6 +9,8 @@
 
 Jikstra TCG é um jogo de cartas digital onde o jogador enfrenta uma IA em duelos por turnos. Cada carta possui três atributos — **Força**, **Velocidade** e **Magia** — que se relacionam em um sistema de vantagens cíclicas (semelhante ao pedra-papel-tesoura). O jogador escolhe sua classe, compra cartas do deck e seleciona qual jogar a cada rodada antes que o tempo acabe.
 
+Todas imagens utilizadas no projeto foram geradas por inteligencia Artficial.
+
 ## Tecnologias
 
 - **Angular 21** — standalone components, SSR via Express / `@angular/ssr`
