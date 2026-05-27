@@ -424,7 +424,7 @@ export class AppComponent {
       { nome: 'Arqueira Veloz',    descricao: 'Intocável.',                 strong: 4,  speed: 9,  intelligence: 5,  imagemUrl: 'cards/arqueira-veloz.png',  tipo: 'velocidade' },
       { nome: 'Mago Sombrio',      descricao: 'Feitiço mortal.',            strong: 2,  speed: 4,  intelligence: 10, imagemUrl: 'cards/mago-sombrio.png',    tipo: 'magia' },
       { nome: 'Dragão Roxo',       descricao: 'Fúria pura.',                strong: 10, speed: 6,  intelligence: 2,  imagemUrl: 'cards/dragao-roxo.png',     tipo: 'força' },
-      { nome: 'Lix',               descricao: 'Rápido e sujo.',             strong: 3,  speed: 8,  intelligence: 4,  imagemUrl: 'cards/Lix.png',             tipo: 'velocidade' },
+      { nome: 'Lix',               descricao: 'Rápido e sujo.',             strong: 3,  speed: 8,  intelligence: 4,  imagemUrl: 'cards/lix.png',             tipo: 'velocidade' },
       { nome: 'Brok',              descricao: 'Pequeno e Monstro.',         strong: 9,  speed: 4,  intelligence: 3,  imagemUrl: 'cards/chapeu-vermelho.png', tipo: 'força' },
       { nome: 'Diabo das Sombras', descricao: 'Pacto de sangue.',           strong: 8,  speed: 7,  intelligence: 5,  imagemUrl: 'cards/zenen.png',           tipo: 'força' },
       { nome: 'Sapo Monge',        descricao: 'O caminho do charco.',       strong: 5,  speed: 8,  intelligence: 6,  imagemUrl: 'cards/sapo-monge.png',      tipo: 'velocidade' },
