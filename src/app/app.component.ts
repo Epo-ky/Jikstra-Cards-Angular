@@ -223,47 +223,65 @@ export class AppComponent {
   }
 
   mainPhase() {
-    this.atualizar(() => {
-      this.faseAtual = 'main';
-      this.cartaJogadorSelecionada = null;
-      if (!this.espelhoAtivo) this.cartaInimigoSelecionada = null;
-      this.mensagemBatalha = this.espelhoAtivo
-        ? `🪞 Espelho ativo! Oponente usará ${this.cartaInimigoSelecionada?.nome}. Escolha sua carta!`
-        : '⚔️ Main Phase — escolha sua carta!';
-      this.log(`MAIN: Aguardando jogador`);
-    });
+  this.atualizar(() => {
+    this.faseAtual = 'main';
+    this.cartaJogadorSelecionada = null;
+    if (!this.espelhoAtivo) this.cartaInimigoSelecionada = null;
+    this.log(`MAIN: Aguardando jogador`);
+  });
 
-    // Auto-select do jogador após 30s
-    this.timerJogador = setTimeout(() => {
+  // Verifica imediatamente se jogador tem monstros
+  const monstros = this.cartasMonstroNaMao;
+  if (monstros.length === 0) {
+    this.atualizar(() => {
+      this.mensagemBatalha = '💀 Sem monstros na mão! Você sofreu dano!';
+      this.log('MAIN: Jogador sem monstros → derrota automática da rodada');
+      this.vidaJogador -= this.DANO_DERROTA;
+      this.checkFimDeJogo();
+    });
+    if (!this.jogoTerminou) {
+      setTimeout(() => this.endPhase(), 1500);
+    }
+    return;
+  }
+
+  this.atualizar(() => {
+    this.mensagemBatalha = this.espelhoAtivo
+      ? `🪞 Espelho ativo! Oponente usará ${this.cartaInimigoSelecionada?.nome}. Escolha sua carta!`
+      : '⚔️ Main Phase — escolha sua carta!';
+  });
+
+  // Auto-select do jogador após 30s
+  this.timerJogador = setTimeout(() => {
+    this.atualizar(() => {
+      if (!this.cartaJogadorSelecionada && this.faseAtual === 'main') {
+        const m = this.cartasMonstroNaMao;
+        const index = Math.floor(Math.random() * m.length);
+        this.cartaJogadorSelecionada = m[index];
+        this.mensagemBatalha = `⏱️ Auto: ${this.cartaJogadorSelecionada.nome}`;
+        this.log(`MAIN: Auto-selecionado → ${this.cartaJogadorSelecionada.nome}`);
+      }
+    });
+    this.verificarProntoParaBatalha();
+  }, this.TEMPO_ESCOLHA_MS);
+
+  // IA escolhe após 1s (se espelho não ativou)
+  if (!this.espelhoAtivo) {
+    this.timerIA = setTimeout(() => {
       this.atualizar(() => {
-        if (!this.cartaJogadorSelecionada && this.faseAtual === 'main') {
-          const monstros = this.cartasMonstroNaMao;
-          const index = Math.floor(Math.random() * monstros.length);
-          this.cartaJogadorSelecionada = monstros[index] || this.maoDoJogador[0];
-          this.mensagemBatalha = `⏱️ Auto: ${this.cartaJogadorSelecionada.nome}`;
-          this.log(`MAIN: Auto-selecionado → ${this.cartaJogadorSelecionada.nome}`);
+        if (this.faseAtual === 'main') {
+          if (this.maoDoOponente.length === 0) this.comprarCarta('oponente');
+          const index = Math.floor(Math.random() * this.maoDoOponente.length);
+          this.cartaInimigoSelecionada = this.maoDoOponente[index];
+          this.log(`MAIN: IA escolheu → ${this.cartaInimigoSelecionada.nome}`);
         }
       });
       this.verificarProntoParaBatalha();
-    }, this.TEMPO_ESCOLHA_MS);
-
-    // IA escolhe após 1s (se espelho não ativou)
-    if (!this.espelhoAtivo) {
-      this.timerIA = setTimeout(() => {
-        this.atualizar(() => {
-          if (this.faseAtual === 'main') {
-            if (this.maoDoOponente.length === 0) this.comprarCarta('oponente');
-            const index = Math.floor(Math.random() * this.maoDoOponente.length);
-            this.cartaInimigoSelecionada = this.maoDoOponente[index];
-            this.log(`MAIN: IA escolheu → ${this.cartaInimigoSelecionada.nome}`);
-          }
-        });
-        this.verificarProntoParaBatalha();
-      }, this.TEMPO_IA_MS);
-    } else {
-      setTimeout(() => this.verificarProntoParaBatalha(), 100);
-    }
+    }, this.TEMPO_IA_MS);
+  } else {
+    setTimeout(() => this.verificarProntoParaBatalha(), 100);
   }
+}
 
   selecionarCarta(carta: Card) {
     if (this.jogoTerminou || this.faseAtual !== 'main') return;
