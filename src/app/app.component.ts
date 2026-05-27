@@ -512,4 +512,14 @@ export class AppComponent {
     this.limparTimers();
     this.iniciarPartida();
   }
+
+  surrender() {
+  this.limparTimers();
+  this.atualizar(() => {
+    this.vidaJogador = 0;
+    this.mensagemBatalha = '🏳️ Você se rendeu...';
+    this.jogoTerminou = true;
+    this.log('FIM: Jogador se rendeu');
+  });
+}
 }

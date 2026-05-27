@@ -437,3 +437,17 @@
 &.vitoria h1 { color: $gold; font-size: 4rem; text-shadow: 0 0 30px rgba(255, 215, 0, 0.6); }
 &.derrota h1 { color: $red; font-size: 4rem; text-shadow: 0 0 30px rgba(255, 68, 68, 0.6); }
    }
+
+   .btn-surrender {
+  position: absolute;
+  top: 10px;
+  left: 120px;
+  background: transparent;
+  border: 1px solid #444;
+  color: #555;
+  padding: 5px 10px;
+  cursor: pointer;
+  z-index: 100;
+  font-weight: bold;
+  &:hover { color: #888; border-color: #888; }
+}

@@ -1,6 +1,7 @@
 <div class="game-container" *ngIf="jogoIniciado; else telaLogin">
   
   <button class="btn-exit" (click)="voltarParaLogin()">❌ SAIR</button>
+  <button class="btn-surrender" (click)="surrender()" *ngIf="jogoIniciado && !jogoTerminou">🏳️ RENDER</button>
   
   <div class="enemy-area">
     <h2>INIMIGO</h2>
