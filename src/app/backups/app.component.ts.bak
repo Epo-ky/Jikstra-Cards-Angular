@@ -444,11 +444,6 @@ export class AppComponent {
       { nome: 'Pamine',            descricao: 'A Fada Preguiçosa.',         strong: 2,  speed: 6,  intelligence: 9,  imagemUrl: 'cards/pamine.png',          tipo: 'magia' },
       { nome: 'Thigas',            descricao: 'O Vilão.',                   strong: 10,  speed: 10,  intelligence: 10,  imagemUrl: 'cards/thigas.png',          tipo: 'magia' },
       { nome: 'Fane',             descricao: 'A Ladra.',                    strong: 3,  speed: 8,  intelligence: 5,  imagemUrl: 'cards/fane.png',           tipo: 'velocidade' },
-      { nome: 'Lifa',             descricao: 'A Lâmina.',                 strong: 7,  speed: 9,  intelligence: 3,  imagemUrl: 'cards/lifa.png',     tipo: 'velocidade' },
-      {nome: 'Luan',              descricao: 'O Samurai.',              strong: 7,  speed: 8,  intelligence: 5,  imagemUrl: 'cards/luan.png',   tipo: 'velocidade' },
-      {nome: 'Ragnar',            descricao: 'O Frio.',            strong: 3, speed: 8,  intelligence: 6,  imagemUrl: 'cards/ragnar.png', tipo: 'velocidade' },
-      {nome: 'Mimico Falho',      descricao: 'O Mimico.',        strong: 3, speed: 7,  intelligence: 4,  imagemUrl: 'cards/mimico.png', tipo: 'velocidade' },
-
   
 
       // Cartas Mágicas
