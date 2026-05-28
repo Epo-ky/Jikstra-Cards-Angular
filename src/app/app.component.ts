@@ -448,6 +448,10 @@ export class AppComponent {
       {nome: 'Luan',              descricao: 'O Samurai.',              strong: 7,  speed: 8,  intelligence: 5,  imagemUrl: 'cards/luan.png',   tipo: 'velocidade' },
       {nome: 'Ragnar',            descricao: 'O Frio.',            strong: 3, speed: 8,  intelligence: 6,  imagemUrl: 'cards/ragnar.png', tipo: 'velocidade' },
       {nome: 'Mimico Falho',      descricao: 'O Mimico.',        strong: 3, speed: 7,  intelligence: 4,  imagemUrl: 'cards/mimico.png', tipo: 'velocidade' },
+      {nome: 'Golem',              descricao: 'O Guardião.',      strong: 8, speed: 4,  intelligence: 6,  imagemUrl: 'cards/golem.png',   tipo: 'força' },
+      {nome: 'Destor',      descricao: 'O Olho Da Destruição.', strong: 9, speed: 3,  intelligence: 5,  imagemUrl: 'cards/destor.png',   tipo: 'força' },
+      {nome: 'Miror',   descricao: 'O Reflexo Majestoso.',   strong: 9, speed: 6,  intelligence: 7,  imagemUrl: 'cards/miror.png',   tipo: 'força' },
+      {nome: 'Rabisco',      descricao: 'Oque não deve ser.', strong: 8, speed: 9,  intelligence: 4,  imagemUrl: 'cards/rabisco.png',   tipo: 'força' },
 
   
 
