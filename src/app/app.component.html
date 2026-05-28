@@ -1,54 +1,51 @@
-<div class="game-container" *ngIf="jogoIniciado; else telaLogin">
+<div class="game-container" *ngIf="game.jogoIniciado; else telaLogin">
   
   <button class="btn-exit" (click)="voltarParaLogin()">❌ SAIR</button>
-  <button class="btn-surrender" (click)="surrender()" *ngIf="jogoIniciado && !jogoTerminou">🏳️ RENDER</button>
+  <button class="btn-surrender" (click)="surrender()" *ngIf="game.jogoIniciado && !game.jogoTerminou">🏳️ RENDER</button>
   
   <div class="enemy-area">
     <h2>INIMIGO</h2>
     <div class="health-bar-container">
-      <div class="health-bar enemy-hp" [style.width.%]="(vidaInimigo / VIDA_INICIAL) * 100"></div>
+      <div class="health-bar enemy-hp" [style.width.%]="(game.vidaInimigo / game.VIDA_INICIAL) * 100"></div>
     </div>
-    <p class="hp-text">{{ vidaInimigo }} / {{ VIDA_INICIAL }}</p>
+    <p class="hp-text">{{ game.vidaInimigo }} / {{ game.VIDA_INICIAL }}</p>
     <div class="hand enemy-hand">
-      <div class="card-back" *ngFor="let c of maoDoOponente">
+      <div class="card-back" *ngFor="let c of game.maoDoOponente">
         <div class="inner-design"></div>
       </div>
     </div>
     <div class="deck enemy-deck">
       <span>DECK</span>
-      <strong>{{ deckOponente.length }}</strong>
+      <strong>{{ game.deckOponente.length }}</strong>
     </div>
   </div>
 
   <div class="battle-area">
-    <div class="message-box" [ngClass]="{'animate': mensagemBatalha}">
-      {{ mensagemBatalha }}
+    <div class="message-box" [ngClass]="{'animate': game.mensagemBatalha}">
+      {{ game.mensagemBatalha }}
     </div>
 
-    <!-- Magic Phase -->
-<div class="magic-phase" *ngIf="faseAtual === 'magic'">
-  <p class="magic-title">✨ Escolha uma carta mágica para usar:</p>
+    <div class="magic-phase" *ngIf="game.faseAtual === 'magic'">
+      <p class="magic-title">✨ Escolha uma carta mágica para usar:</p>
+      <div class="magic-cards">
+        <app-card
+          *ngFor="let card of game.cartasMagicasNaMao"
+          [cardData]="card"
+          (click)="usarCartaMagica(card); $event.stopPropagation()">
+        </app-card>
+      </div>
+      <button
+        type="button"
+        class="btn-skip-magic"
+        (click)="pularMagia(); $event.stopPropagation()">
+        NÃO USAR
+      </button>
+    </div>
 
-  <div class="magic-cards">
-    <app-card
-      *ngFor="let card of cartasMagicasNaMao"
-      [cardData]="card"
-      (click)="usarCartaMagica(card); $event.stopPropagation()">
-    </app-card>
-  </div>
-
-  <button
-    type="button"
-    class="btn-skip-magic"
-    (click)="pularMagia(); $event.stopPropagation()">
-    NÃO USAR
-  </button>
-</div>
-    <!-- Carta do oponente (battle phase ou espelho ativo) -->
     <div class="battle-slot enemy-slot">
       <app-card 
-        *ngIf="cartaInimigoSelecionada && (faseAtual === 'battle' || espelhoAtivo)"
-        [cardData]="cartaInimigoSelecionada" 
+        *ngIf="game.cartaInimigoSelecionada && (game.faseAtual === 'battle' || game.espelhoAtivo)"
+        [cardData]="game.cartaInimigoSelecionada" 
         [isEnemy]="true">
       </app-card>
     </div>
@@ -57,28 +54,28 @@
   <div class="player-area">
     <div class="deck player-deck">
       <span>DECK</span>
-      <strong>{{ deckJogador.length }}</strong>
+      <strong>{{ game.deckJogador.length }}</strong>
     </div>
     <div class="hand player-hand">
       <app-card 
-        *ngFor="let card of cartasMonstroNaMao" 
+        *ngFor="let card of game.cartasMonstroNaMao" 
         [cardData]="card"
         class="player-card-wrapper"
         (click)="selecionarCarta(card)">
       </app-card>
     </div>
     <div class="health-bar-container">
-      <div class="health-bar player-hp" [style.width.%]="(vidaJogador / VIDA_INICIAL) * 100"></div>
+      <div class="health-bar player-hp" [style.width.%]="(game.vidaJogador / game.VIDA_INICIAL) * 100"></div>
     </div>
-    <p class="hp-text">{{ vidaJogador }} / {{ VIDA_INICIAL }}</p>
-    <h2>{{ nomeJogador }}</h2>
+    <p class="hp-text">{{ game.vidaJogador }} / {{ game.VIDA_INICIAL }}</p>
+    <h2>{{ game.nomeJogador }}</h2>
   </div>
 
-  <div class="modal-overlay" *ngIf="jogoTerminou">
-    <div class="modal-content" [class.vitoria]="vidaInimigo <= 0" [class.derrota]="vidaJogador <= 0">
-  <p class="modal-subtitulo">{{ vidaInimigo <= 0 ? 'FIM DE JOGO' : 'GAME OVER' }}</p>
-  <h1>{{ vidaInimigo <= 0 ? 'VITÓRIA' : 'DERROTA' }}</h1>
-  <p class="result-msg">{{ vidaInimigo <= 0 ? 'O destino sorriu para você hoje.' : mensagemBatalha }}</p>
+  <div class="modal-overlay" *ngIf="game.jogoTerminou">
+    <div class="modal-content" [class.vitoria]="game.vidaInimigo <= 0" [class.derrota]="game.vidaJogador <= 0">
+      <p class="modal-subtitulo">{{ game.vidaInimigo <= 0 ? 'FIM DE JOGO' : 'GAME OVER' }}</p>
+      <h1>{{ game.vidaInimigo <= 0 ? 'VITÓRIA' : 'DERROTA' }}</h1>
+      <p class="result-msg">{{ game.vidaInimigo <= 0 ? 'O destino sorriu para você hoje.' : game.mensagemBatalha }}</p>
       <div class="modal-buttons">
         <button class="btn-action" (click)="reiniciar()">JOGAR NOVAMENTE</button>
         <button class="btn-action secondary" (click)="voltarParaLogin()">MENU PRINCIPAL</button>
@@ -99,17 +96,17 @@
         <div 
           class="class-card" 
           *ngFor="let c of classesDisponiveis"
-          [class.selected]="classeSelecionada === c"
+          [class.selected]="game.classeSelecionada === c"
           (click)="selecionarClasse(c)">
           <div class="icon">{{ c.icone }}</div>
           <div class="name">{{ c.nome }}</div>
           <div class="desc">{{ c.desc }}</div>
-          <div class="stat">HP INICIAL: {{ VIDA_INICIAL }}</div>
+          <div class="stat">HP INICIAL: {{ game.VIDA_INICIAL }}</div>
         </div>
       </div>
       <button 
         class="btn-start"
-        [disabled]="!nomeInput.value || !classeSelecionada"
+        [disabled]="!nomeInput.value || !game.classeSelecionada"
         (click)="entrarNoJogo(nomeInput.value)">
         INICIAR DUELO
       </button>
